@@ -1,0 +1,39 @@
+import { TypeRootStackParamList } from "@/processes"
+import { FC } from "react"
+import { TypeNavigate } from "./interface/IMenuItem"
+import { menuData } from "./interface/menu-data"
+import { MenuItem } from "./components/MenuItem"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { View } from "react-native"
+
+export interface IBottomMenuProps {
+    navigate: TypeNavigate
+    currentPath: keyof TypeRootStackParamList
+}
+
+export const BottomMenu: FC<IBottomMenuProps> = (props) => {
+
+    const { bottom, top } = useSafeAreaInsets()
+    return (
+
+        <View
+            className="flex-row items-center justify-between bg-white"
+            style={{
+                paddingBottom: bottom + 10,
+                paddingTop: 10
+
+            }}>
+            {
+                menuData.map((item) => (
+                    <MenuItem
+                        key={item.path}
+                        item={item}
+                        {...props}
+
+                    />
+                ))
+            }
+
+        </View>
+    )
+}
