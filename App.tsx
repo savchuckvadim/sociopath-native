@@ -22,6 +22,16 @@ import { Text, View } from 'react-native';
 import { Toast } from '@/shared';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
+
+// В самом верху твоего основного файла (App.tsx или index.ts)
+import { registerGlobals } from '@livekit/react-native';
+import { LogBox } from 'react-native';
+
+registerGlobals();
+// LiveKit иногда кидает ворнинги из-за таймеров WebRTC, их можно скрыть
+LogBox.ignoreLogs(['Setting a timer']);
+
+
 // Configure NativeWind to use class-based dark mode
 const queryClient = new QueryClient({
     defaultOptions: {

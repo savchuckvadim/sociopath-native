@@ -33,7 +33,7 @@ export const getAuth = () => {
     });
   };
   /**
-   * @summary Login
+   * @summary Login for mobile app
    */
   const authMobileLogin = (loginDto: LoginDto) => {
     return customAxios<AuthenticatedUserDto>({

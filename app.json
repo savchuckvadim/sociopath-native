@@ -10,10 +10,27 @@
       "tsconfigPaths": true
     },
     "plugins": [
-      "expo-secure-store"
+      "expo-secure-store",
+      "@livekit/react-native-expo-plugin",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow sociopath to access your camera",
+          "microphonePermission": "Allow sociopath to access your microphone"
+        }
+      ],
+      [
+        "@config-plugins/react-native-webrtc",
+        {
+          "appleAudioCategory": "PlayAndRecord",
+          "ios": {
+            "microphonePermission": "Allow sociopath to access your microphone"
+          }
+        }
+      ]
     ],
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/icon-sociopath.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -24,14 +41,56 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.sociopath.app",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "audio",
+          "voip",
+          "audio",
+          "voip",
+          "audio",
+          "voip",
+          "audio",
+          "voip"
+        ],
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "bitcode": false
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#212121"
       },
-      "package": "com.anonymous.myexpoapp"
+      "package": "com.sociopath.app",
+      "permissions": [
+        "CAMERA",
+        "RECORD_AUDIO",
+        "MODIFY_AUDIO_SETTINGS",
+        "BLUETOOTH",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.ACCESS_NETWORK_STATE",
+        "android.permission.INTERNET",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.WAKE_LOCK",
+        "android.permission.BLUETOOTH"
+      ]
+    },
+    "scheme": "sociopath",
+    "extra": {
+      "eas": {
+        "projectId": "1687bf1a-4f85-4f26-b7ce-b2431017902b"
+      }
+    },
+    "owner": "nmbrsdntl",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/1687bf1a-4f85-4f26-b7ce-b2431017902b"
     }
   }
 }

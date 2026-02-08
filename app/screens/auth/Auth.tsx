@@ -76,7 +76,7 @@ export default function Auth() {
                     {/* Переключение между формами */}
                     {!isLogin && <View className="mt-4 flex-row items-center justify-center">
                         <Text className="text-sm text-gray-500">
-                            {isLogin ? "Нет аккаунта?" : "Уже есть аккаунт?"}
+                            {isLogin ? "test    Нет аккаунта?" : "Уже есть аккаунт?"}
                         </Text>
                         <TouchableOpacity
                             onPress={() => setIsLogin(!isLogin)}

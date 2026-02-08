@@ -8,6 +8,7 @@
 
 export * from './addMemberDto';
 export * from './authenticatedUserDto';
+export * from './callTokenDto';
 export * from './chatDto';
 export * from './chatMemberDto';
 export * from './createChatDto';
@@ -17,6 +18,7 @@ export * from './createUserDto';
 export * from './errorResponseDto';
 export * from './errorResponseDtoResultCode';
 export * from './followDto';
+export * from './getTokenDto';
 export * from './loginDto';
 export * from './messageDto';
 export * from './messagesGetChatMessagesParams';

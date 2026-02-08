@@ -1,6 +1,8 @@
 module.exports = function (api) {
     api.cache(true);
-    let plugins = [];
+    let plugins = [
+
+    ];
 
     // react-native-worklets/plugin заменяет react-native-reanimated/plugin в версии 4.x
     // Должен быть последним в списке плагинов

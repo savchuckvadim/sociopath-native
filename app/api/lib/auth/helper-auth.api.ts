@@ -9,7 +9,7 @@ export const getNewTokens = async () => {
     try {
         const refreshToken = await AsyncStorage.getItem(EnumAuthType.REFRESH_TOKEN);
         const response = await axios.post<string, { data: IAuthResponse }>(
-            API_URL + '/api/auth/refresh',
+            API_URL + '/auth/refresh',
             { refreshToken },
             {
                 headers: {
