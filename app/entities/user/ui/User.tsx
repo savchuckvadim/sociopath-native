@@ -1,4 +1,3 @@
-'use client'
 import { useUser } from "../lib/hook/user.hook";
 import { UserCard } from "./UserCard";
 

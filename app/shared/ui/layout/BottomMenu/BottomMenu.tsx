@@ -5,6 +5,7 @@ import { menuData } from "./interface/menu-data"
 import { MenuItem } from "./components/MenuItem"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { View } from "react-native"
+import { useUnreadCount } from "@/entities/messages/lib/hooks/useUnreadCount"
 
 export interface IBottomMenuProps {
     navigate: TypeNavigate
@@ -12,10 +13,10 @@ export interface IBottomMenuProps {
 }
 
 export const BottomMenu: FC<IBottomMenuProps> = (props) => {
-
     const { bottom, top } = useSafeAreaInsets()
-    return (
+    const { hasUnread } = useUnreadCount()
 
+    return (
         <View
             className="flex-row items-center justify-between bg-white"
             style={{
@@ -24,14 +25,18 @@ export const BottomMenu: FC<IBottomMenuProps> = (props) => {
 
             }}>
             {
-                menuData.map((item) => (
-                    <MenuItem
-                        key={item.path}
-                        item={item}
-                        {...props}
-
-                    />
-                ))
+                menuData.map((item) => {
+                    // Показываем бейдж только для Messages
+                    const showBadge = item.path === 'Messages' && hasUnread;
+                    return (
+                        <MenuItem
+                            key={item.path}
+                            item={item}
+                            {...props}
+                            badge={showBadge}
+                        />
+                    )
+                })
             }
 
         </View>

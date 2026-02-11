@@ -26,9 +26,12 @@ export const saveTokensToStorage = async (tokens: ITokens) => {
 
 export const removeTokensFromStorage = async () => {
     try {
+        console.log('🗑️ removeTokensFromStorage: Removing tokens from storage...');
         await AsyncStorage.removeItem(EnumAuthType.ACCESS_TOKEN);
         await AsyncStorage.removeItem(EnumAuthType.REFRESH_TOKEN);
+        console.log('🗑️ removeTokensFromStorage: Tokens removed successfully');
     } catch (error) {
+        console.error('🗑️ removeTokensFromStorage error:', error);
         return null;
     }
 }
@@ -51,8 +54,11 @@ const setUserToStorage = async (user: IUser) => {
 }
 export const removeUserFromStorage = async () => {
     try {
+        console.log('🗑️ removeUserFromStorage: Removing user from storage...');
         await AsyncStorage.removeItem(EnumAsynStorage.USER);
+        console.log('🗑️ removeUserFromStorage: User removed successfully');
     } catch (error) {
+        console.error('🗑️ removeUserFromStorage error:', error);
         return null;
     }
 }

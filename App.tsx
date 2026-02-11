@@ -11,10 +11,12 @@
 //     </>
 //   );
 // }
+// eas build --platform ios
+// eas submit --platform ios
 import { Navigation } from '@/processes/navigation/ui/Navigation';
 import { StatusBar } from 'expo-status-bar';
 
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import './global.css';
 import { AuthProvider } from '@/processes/auth/providers/AuthProvider';
 // import Camera from '@/components/camera/Camera';
@@ -43,22 +45,15 @@ const queryClient = new QueryClient({
 export default function App() {
 
     return <QueryClientProvider client={queryClient}>
-
-        <AuthProvider>
-            <SafeAreaProvider>
-
-                {/* <Camera/> */}
-                <Navigation />
-                {/* <View className='bg-red-500 h-screen w-screen '>
-                    <View className='w-9/12 h-9/12 bg-blue-500 m-10  '>
-                        <Text className='text-white text-2xl font-bold'>Hello</Text>
-                    </View>
-                </View> */}
-
-            </SafeAreaProvider>
-        </AuthProvider>
-        <StatusBar style="dark" />
-        <Toast />
+        <SafeAreaProvider>
+            <AuthProvider>
+                <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+                    <StatusBar style="dark" />
+                    <Navigation />
+                </SafeAreaView>
+                <Toast />
+            </AuthProvider>
+        </SafeAreaProvider>
     </QueryClientProvider>;
 
 }

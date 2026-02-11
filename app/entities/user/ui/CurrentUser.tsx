@@ -1,13 +1,30 @@
-'use client'
-import { useAuth } from "@/modules/processes";
-import Link from "next/link";
+import { Text, TouchableOpacity, StyleSheet } from "react-native";
+import { useAuth } from "@/processes";
+import { useTypedNavigation } from "@/hooks/typed-navigation.hook";
+import { colors } from "@/shared/style/colors";
 
 export const CurrentUser = () => {
-    const { currentUser } = useAuth();
-    
+    const { user } = useAuth();
+    const navigation = useTypedNavigation();
+
+    const handlePress = () => {
+        navigation.navigate('Me');
+    };
+
+    if (!user?.name) {
+        return null;
+    }
+
     return (
-        <Link href="/network/profile">
-            <p className="text-sm text-primary">{currentUser?.name}</p>
-        </Link>
-    )
-}
+        <TouchableOpacity onPress={handlePress}>
+            <Text style={styles.text}>{user.name}</Text>
+        </TouchableOpacity>
+    );
+};
+
+const styles = StyleSheet.create({
+    text: {
+        fontSize: 14,
+        color: colors.primary,
+    },
+});

@@ -1,25 +1,29 @@
-import { UserDto } from "@workspace/nest-api";
-import { Button } from "@workspace/ui/components/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@workspace/ui/components/card";
-import Link from "next/link";
+import { View, Text, TouchableOpacity } from "react-native";
+import { UserDto } from "@/api";
+import { Button } from "@/shared";
+import { useNavigation } from "@react-navigation/native";
 
-
-export const UserCard = ({ user }: { user: UserDto }) => {
-    return (
-        <Card className="w-full h-[30vh] bg-background/40">
-            <CardHeader>
-                <CardTitle className="text-2xl font-bold">{user.name}</CardTitle>
-                {/* <CardDescription className="text-sm text-gray-500">{user.email}</CardDescription> */}
-            </CardHeader>
-            <CardContent className="flex flex-col gap-2">
-                <p className="text-sm text-gray-500 mb-2">{user.email}</p>
-                <Link href={`/network/users`}>
-                    <Button className="w-full">
-                        Найти друзей
-                    </Button>
-                </Link>
-            </CardContent>
-
-        </Card>
-    )
+interface UserCardProps {
+    user: UserDto;
 }
+
+export const UserCard = ({ user }: UserCardProps) => {
+    const navigation = useNavigation();
+
+    return (
+        <View className="w-full p-4 bg-white rounded-lg border border-gray-200 mb-4">
+            <Text className="text-xl font-bold mb-2">{user.name}</Text>
+            <Text className="text-sm text-gray-500 mb-4">{user.email}</Text>
+            <TouchableOpacity
+                onPress={() => {
+                    // @ts-ignore
+                    navigation.navigate('UserProfile', { userId: user.id });
+                }}
+            >
+                <View className="bg-red-500 rounded-lg py-2 px-4">
+                    <Text className="text-white text-center font-medium">View Profile</Text>
+                </View>
+            </TouchableOpacity>
+        </View>
+    );
+};

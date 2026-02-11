@@ -1,18 +1,38 @@
-'use client';
-
-import { Button } from "@workspace/ui/components/button";
-import { Loader2, LogOut } from "lucide-react";
-import { useAuth } from "../../lib/hooks/auth.hook";
-
+import { LogOut } from "lucide-react-native";
+import { ActivityIndicator, Pressable, Text } from "react-native";
+import { useAuthLogout } from "../../lib/hooks/auth-logout.hook";
+import { useCallback } from "react";
+import clsx from "clsx";
 
 export const Logout = () => {
-    const { logout, isLoading } = useAuth();
+    const { logout, isLogoutLoading: isLoading } = useAuthLogout();
+    const handleLogout = useCallback(() => {
+        logout();
+    }, [logout]);
+
     return (
-        <div className="cursor-pointer">
-            <Button variant="outline" onClick={logout} disabled={isLoading}>
-                {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
+        <Pressable
+            onPress={handleLogout}
+            disabled={isLoading}
+            className={clsx(
+                'self-center',
+                'rounded-lg',
+                'w-full',
+                'py-3',
+                'flex-row',
+                'items-center',
+                'justify-center',
+                isLoading ? 'bg-gray-400' : 'bg-[#F44848]'
+            )}
+        >
+            {isLoading ? (
+                <ActivityIndicator size="small" color="white" />
+            ) : (
+                <LogOut size={16} color="white" />
+            )}
+            <Text className={clsx("text-white font-medium", 'ml-2')}>
                 Выйти
-            </Button>
-        </div>
-    )
-}
+            </Text>
+        </Pressable>
+    );
+};

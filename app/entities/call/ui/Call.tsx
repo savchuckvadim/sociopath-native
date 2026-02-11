@@ -21,6 +21,8 @@ import {
 import { Track } from 'livekit-client';
 import { useCallToken } from '../lib/hooks/call-token.hook';
 import { Loader } from '@/shared';
+import { useRoute, RouteProp } from '@react-navigation/native';
+import { TypeRootStackParamList } from '@/processes/navigation/interface/navigation.interface';
 
 // !! Note !!
 // This sample hardcodes a token which expires in 2 hours.
@@ -40,9 +42,12 @@ const LIVEKIT_URL = 'https://ws.sociopath-network.ru/';
 console.log('🔵 LiveKit URL configured:', LIVEKIT_URL);
 console.log('🔵 Expected WebSocket URL:', LIVEKIT_URL.replace('https://', 'wss://').replace(/\/$/, '') + '/rtc');
 
+type CallScreenRouteProp = RouteProp<TypeRootStackParamList, 'Call'>;
 
 export default function Call() {
-    const { token } = useCallToken('test');
+    const route = useRoute<CallScreenRouteProp>();
+    const { roomName, callType } = route.params || { roomName: 'test', callType: 'audio' as const };
+    const { token } = useCallToken(roomName);
     const [isConnected, setIsConnected] = useState(false);
 
     console.log('🔵 Call component render - token:', token ? 'YES' : 'NO', 'isConnected:', isConnected);
@@ -99,7 +104,7 @@ export default function Call() {
                 adaptiveStream: { pixelDensity: 'screen' },
             }}
             audio={isConnected}
-            video={isConnected}
+            video={isConnected && callType === 'video'}
             onConnected={() => {
                 console.log('✅ LiveKit connected successfully!');
                 setIsConnected(true);

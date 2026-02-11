@@ -1,9 +1,9 @@
 import { TypeRootStackParamList } from "@/processes/navigation/interface/navigation.interface"
-import { TypeFeatherIconNames } from "@/shared/ui/Icon/IIcon"
+import { LucideIcon } from "lucide-react-native"
 
 export interface IMenuItem {
     name: string
-    icon: TypeFeatherIconNames
+    icon: LucideIcon
     path: keyof TypeRootStackParamList
 }
 

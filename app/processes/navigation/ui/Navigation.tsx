@@ -5,6 +5,7 @@ import { BottomMenu } from "@/shared";
 import { useAuth } from "@/processes/auth";
 import { useEffect, useState } from "react";
 import { useAuthCheck } from "@/processes/auth/lib/hooks/auth-check.hook";
+import { useGlobalMessagesSocket } from "@/entities/chats/lib/hooks/useGlobalMessagesSocket";
 
 
 export const Navigation = () => {
@@ -22,6 +23,9 @@ export const Navigation = () => {
         return () => navRef.removeListener('state', listener);
     }, []);
     useAuthCheck(currentRoute);
+
+    // Глобальный WebSocket слушатель для уведомлений о сообщениях
+    useGlobalMessagesSocket();
     return (
         <>
             <NavigationContainer ref={navRef}>

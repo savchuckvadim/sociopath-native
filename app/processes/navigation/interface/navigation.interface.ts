@@ -9,6 +9,18 @@ export type TypeRootStackParamList = {
     Settings: undefined;
     Notifications: undefined;
     Messages: undefined;
+    Chat: {
+        chatId: string;
+    };
+    Call: {
+        roomName: string;
+        callType: 'audio' | 'video';
+    };
+    People: undefined;
+    Me: undefined;
+    UserProfile: {
+        userId: string;
+    };
     Product: {
         slug: string;
     };

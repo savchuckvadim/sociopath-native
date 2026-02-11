@@ -1,6 +1,5 @@
 import axios, { Method } from 'axios';
 import { Platform } from 'react-native';
-import { getAccessToken } from './auth/helper-storage.api';
 import { SERVER_URL } from '@/config/api.config';
 
 console.log('back-api SERVER_URL', SERVER_URL);
@@ -9,6 +8,7 @@ console.log('back-api SERVER_URL', SERVER_URL);
 // Для iOS эмулятора localhost работает
 // Для веба используем localhost или SERVER_URL из env
 const getBaseUrl = () => {
+    // baseURL должен быть БЕЗ /api, так как все запросы уже содержат /api в пути
     return "https://api.sociopath-network.ru"
     // let baseUrl = SERVER_URL || 'http://localhost:3000';
 
@@ -49,6 +49,13 @@ export const $api = axios.create({
     withCredentials: true,
     headers: headers,
 });
+
+// Регистрируем интерцепторы после создания $api
+// Импортируем функции установки интерцепторов (не сами интерцепторы)
+import { setupTokenInterceptor } from './interceptors/with-token.interceptor';
+import { setupRefreshInterceptor } from './interceptors/refresh.interceptor';
+
+
 // // // 🔐 автоматически добавляем JWT
 // $api.interceptors.request.use((config) => {
 //     const token = localStorage.getItem(AUTH_TOKEN_NAME);
@@ -85,7 +92,8 @@ export const $api = axios.create({
 // });
 
 
-
+setupTokenInterceptor($api);
+setupRefreshInterceptor($api);
 export const customAxios = async<T>({
     url,
     method,
@@ -100,20 +108,36 @@ export const customAxios = async<T>({
     headers?: any;
 }): Promise<T> => {
     // // Orval всегда ждёт, что mutator возвращает **данные**, а не { resultCode, data }
+    const fullUrl = `${$api.defaults.baseURL}${url}`;
     console.log('customAxios url', url);
-    debugger
-    const res = await $api.request<IBackResponse<T>>({
-        url,
-        method: method as Method,
-        data,
-        params, // 🔹 вот здесь axios сам превращает объект в query string
-        headers,
-    });
+    console.log('customAxios fullUrl', fullUrl);
+    console.log('customAxios method', method);
 
-    console.log('customAxios res', res.data);
-    if (res.data.resultCode !== EResultCode.SUCCESS) {
-        throw new Error(res.data.message || `Backend error ${url}`);
+    try {
+        const res = await $api.request<IBackResponse<T>>({
+            url,
+            method: method as Method,
+            data,
+            params, // 🔹 вот здесь axios сам превращает объект в query string
+            headers,
+        });
+        console.log('customAxios res', res.data);
+        if (res.data.resultCode !== EResultCode.SUCCESS) {
+            console.log('customAxios EResultCode != SUCCESS  res.data', res.data);
+            throw new Error(res.data.message || `Backend error ${url}`);
+        }
+
+        return res.data.data as T;
+    } catch (error: any) {
+        console.error('customAxios error:', {
+            message: error.message,
+            code: error.code,
+            response: error.response ? {
+                status: error.response.status,
+                data: error.response.data,
+            } : 'No response',
+            url: fullUrl,
+        });
+        throw error;
     }
-
-    return res.data.data as T;
 };

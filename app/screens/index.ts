@@ -1,3 +1,9 @@
 export { default as Auth } from './auth/Auth';
 export { default as Home } from './home/Home';
-export { default as Chats } from './chats/Chats'
+export { default as Chats } from './chats/Chats';
+export { default as ChatListScreen } from './chats/ChatListScreen';
+export { default as ChatScreen } from './chats/ChatScreen';
+export { default as People } from './people/People';
+export { default as Me } from './me/Me';
+export { default as UserProfile } from './user-profile/UserProfile';
+export { default as Settings } from './settings/Settings';

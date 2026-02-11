@@ -1,24 +1,31 @@
 import { IMenuItem } from "./IMenuItem";
+import { User, Users, MessageSquare, Settings, Home } from "lucide-react-native";
 
 export const menuData: IMenuItem[] = [
+    // {
+    //     name: 'Home',
+    //     icon: Home,
+    //     path: 'Home',
+    // },
+
     {
-        name: 'Home',
-        icon: 'home',
-        path: 'Home',
+        name: 'Me',
+        icon: User,
+        path: 'Me',
+    },
+    {
+        name: 'People',
+        icon: Users,
+        path: 'People',
     },
     {
         name: 'Messages',
-        icon: 'mail',
+        icon: MessageSquare,
         path: 'Messages',
     },
     {
-        name: 'Profile',
-        icon: 'user',
-        path: 'Profile',
-    },
-    {
         name: 'Settings',
-        icon: 'settings',
+        icon: Settings,
         path: 'Settings',
     },
 ]

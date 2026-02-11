@@ -35,8 +35,11 @@ export const useAuthMutations = (
     });
 
 
+
     return  useMemo(() => ({
-        login: loginSync, isLoginLoading,
+        login: loginSync,
+      
+        isLoginLoading,
         registration: registrationSync, isRegistrationLoading,
         isLoading: isLoginLoading || isRegistrationLoading,
     }), [loginSync, registrationSync, isLoginLoading, isRegistrationLoading]);
