@@ -5,6 +5,7 @@
  * API for auth backend for monorepo
  * OpenAPI spec version: 1.0
  */
+import type { ChatMemberDtoRole } from './chatMemberDtoRole';
 import type { UserDto } from './userDto';
 
 export interface ChatMemberDto {
@@ -15,7 +16,7 @@ export interface ChatMemberDto {
   /** User ID */
   userId: string;
   /** Role */
-  role: string;
+  role: ChatMemberDtoRole;
   /** Joined At */
   joinedAt: string;
   /** Left At */

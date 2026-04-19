@@ -5,10 +5,14 @@
  * API for auth backend for monorepo
  * OpenAPI spec version: 1.0
  */
+import type { CreateChatDtoType } from './createChatDtoType';
+import type { CreateChatDtoEncryptionMode } from './createChatDtoEncryptionMode';
 
 export interface CreateChatDto {
   /** Type */
-  type: string;
+  type: CreateChatDtoType;
+  /** Messenger E2EE mode (orthogonal to type). Cannot be changed after create. A second private chat with the same peer but a different mode is a separate chat row (separate chatId). */
+  encryptionMode?: CreateChatDtoEncryptionMode;
   /** Name */
   name: string;
   /** Description */

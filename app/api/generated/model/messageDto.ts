@@ -5,7 +5,51 @@
  * API for auth backend for monorepo
  * OpenAPI spec version: 1.0
  */
+import type { MessageDtoType } from './messageDtoType';
+import type { UserDto } from './userDto';
+import type { MessageDto as __MessageDto } from './messageDto';
 
 export interface MessageDto {
-  [key: string]: unknown;
+  /** ID */
+  id: string;
+  /** Chat ID */
+  chatId: string;
+  /** Sender ID */
+  senderId: string;
+  /** Content */
+  content: string;
+  /** Message kind */
+  type: MessageDtoType;
+  /** File URL */
+  fileUrl?: string;
+  /** File Name */
+  fileName?: string;
+  /** File Size */
+  fileSize?: number;
+  /** Reply To ID */
+  replyToId?: string;
+  /** Edited At */
+  editedAt?: string;
+  /** Deleted At */
+  deletedAt?: string;
+  /** Created At */
+  createdAt: string;
+  /** Updated At */
+  updatedAt: string;
+  /** Sender */
+  sender?: UserDto;
+  replyTo?: __MessageDto;
+  readBy?: string[];
+  /** Is Encrypted */
+  isEncrypted?: boolean;
+  /** To Device ID */
+  toDeviceId?: string;
+  /** Signal Message Type */
+  signalMessageType?: string;
+  /** Registration ID */
+  registrationId?: number;
+  /** Sender Device ID */
+  senderDeviceId?: string;
+  /** Sender Client Device ID */
+  senderClientDeviceId?: string;
 }

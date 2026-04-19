@@ -8,9 +8,19 @@
 
 export interface UpdateChatDto {
   /** Name */
-  name: string;
+  name?: string;
   /** Description */
-  description: string;
+  description?: string;
   /** Avatar */
-  avatar: string;
+  avatar?: string;
+  /**
+   * Удалить весь чат в указанный момент (ISO 8601). `null` — отключить.
+   * @nullable
+   */
+  scheduledDeletionAt?: string | null;
+  /**
+   * Новые сообщения удалять через N секунд (`null` или `0` — выкл.).
+   * @nullable
+   */
+  disappearingMessageSeconds?: number | null;
 }

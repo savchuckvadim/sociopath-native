@@ -1,5 +1,3 @@
-import { UseFormReset } from "react-hook-form";
-import { IAuthFormData } from "../../type/auth.type";
 import { useAuth } from "./auth.hook";
 import { useMutation } from "@tanstack/react-query";
 import { AuthService } from "../api/AuthService";

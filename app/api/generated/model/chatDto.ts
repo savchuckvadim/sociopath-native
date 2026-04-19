@@ -5,6 +5,8 @@
  * API for auth backend for monorepo
  * OpenAPI spec version: 1.0
  */
+import type { ChatDtoType } from './chatDtoType';
+import type { ChatDtoEncryptionMode } from './chatDtoEncryptionMode';
 import type { ChatMemberDto } from './chatMemberDto';
 import type { MessageDto } from './messageDto';
 
@@ -12,7 +14,9 @@ export interface ChatDto {
   /** ID */
   id: string;
   /** Type */
-  type: string;
+  type: ChatDtoType;
+  /** Messenger E2EE mode. Immutable after create. To use both plaintext and E2EE with the same contact, create two private chats (different chatId). */
+  encryptionMode: ChatDtoEncryptionMode;
   /** Name */
   name: string;
   /** Description */
@@ -25,10 +29,16 @@ export interface ChatDto {
   createdAt: string;
   /** Updated At */
   updatedAt: string;
+  /** Автоудаление всего чата в это время */
+  scheduledDeletionAt?: string;
+  /** Новые сообщения исчезают через N секунд (0 = выкл.) */
+  disappearingMessageSeconds?: number;
   /** Members */
   members: ChatMemberDto[];
   /** Unread Count */
   unreadCount: number;
   /** Last Message */
   lastMessage: MessageDto;
+  /** When last message is from current user (private chat): peer has read it (double-check UX) */
+  lastMessageOutgoingRead?: boolean;
 }

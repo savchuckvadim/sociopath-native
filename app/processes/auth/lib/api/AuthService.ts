@@ -1,15 +1,11 @@
-import { CreateUserDto } from "@/api";
-import { clearStorage, removeTokensFromStorage, saveToStorage } from "@/api/lib/auth/helper-storage.api";
-import { getAuth } from "@/api/generated/auth/auth";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { EnumAuthType } from "@/api/lib/auth/auth.type";
-import axios from "axios";
-import { API_URL } from "@/config/api.config";
+import { CreateUserDto, RefreshTokenDto } from "@/api";
+import { clearStorage, getRefreshToken, saveToStorage } from "@/api/lib/auth/helper-storage.api";
+import { getAuthMobile } from "@/api/generated/auth-mobile/auth-mobile";
+
 
 
 export class AuthService {
-    api = getAuth();
-    constructor() { }
+    api = getAuthMobile();
 
     async login(email: string, password: string) {
         console.log('email', email);
@@ -25,7 +21,7 @@ export class AuthService {
     }
 
     async registration(user: CreateUserDto) {
-        const response = await this.api.authRegistration(user);
+        const response = await this.api.authMobileRegistration(user);
         await saveToStorage({
             accessToken: response.tokens.accessToken,
             refreshToken: response.tokens.refreshToken,
@@ -35,12 +31,16 @@ export class AuthService {
     }
 
     async activate(link: string) {
-        const response = await this.api.authActivate(link);
+        const response = await this.api.authMobileActivate(link);
         return response;
     }
 
     async logout() {
-        await this.api.authLogout();
+        const refreshToken = await getRefreshToken();
+        if (!refreshToken) {
+            throw new Error('Refresh token not found');
+        }
+        await this.api.authMobileLogout({ refreshToken: refreshToken } as RefreshTokenDto);
         await clearStorage();
         return true;
     }
@@ -68,6 +68,10 @@ export class AuthService {
     //     return true;
     // }
     async refreshToken() {
-        return await this.api.authRefreshToken();
+        const refreshToken = await getRefreshToken();
+        if (!refreshToken) {
+            throw new Error('Refresh token not found');
+        }
+        return await this.api.authMobileRefreshToken({ refreshToken } as RefreshTokenDto);
     }
 }

@@ -27,7 +27,7 @@ const getBaseUrl = () => {
 
 const url = getBaseUrl();
 console.log('back-api url', url, 'Platform:', Platform.OS);
-const AUTH_TOKEN_NAME = 'accessToken';
+// const AUTH_TOKEN_NAME = 'accessToken';
 
 export interface IBackResponse<T> {
     resultCode: EResultCode; // 0 - успех, 1 - ошибка

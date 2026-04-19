@@ -34,4 +34,14 @@ export interface CreateMessageDto {
    * @nullable
    */
   replyToId?: string | null;
+  /** Signal E2EE: true when content is ciphertext (required for chats with encryptionMode=SIGNAL) */
+  isEncrypted?: boolean;
+  /** Target device row id (server Device.id) for multi-device fan-out */
+  toDeviceId?: string;
+  /** Your device row id (Device.id) so recipients can open the correct Signal session */
+  senderDeviceId?: string;
+  /** Libsignal message type label (e.g. WHISPER, PREKEY) */
+  signalMessageType?: string;
+  /** Signal registration id (metadata only) */
+  registrationId?: number;
 }

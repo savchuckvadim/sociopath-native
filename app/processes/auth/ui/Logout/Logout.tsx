@@ -2,7 +2,7 @@ import { LogOut } from "lucide-react-native";
 import { ActivityIndicator, Pressable, Text } from "react-native";
 import { useAuthLogout } from "../../lib/hooks/auth-logout.hook";
 import { useCallback } from "react";
-import clsx from "clsx";
+import {clsx} from "clsx";
 
 export const Logout = () => {
     const { logout, isLogoutLoading: isLoading } = useAuthLogout();
