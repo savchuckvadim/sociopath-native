@@ -44,29 +44,6 @@ export class AuthService {
         await clearStorage();
         return true;
     }
-    // async logout() {
-    //     try {
-    //         // Для мобильного приложения используем /auth-mobile/logout с refreshToken в body
-    //         const refreshToken = await AsyncStorage.getItem(EnumAuthType.REFRESH_TOKEN);
-
-    //         if (refreshToken) {
-    //             await axios.post(
-    //                 API_URL + '/auth-mobile/logout',
-    //                 { refreshToken },
-    //                 {
-    //                     headers: {
-    //                         'Content-Type': 'application/json',
-    //                     },
-    //                 }
-    //             );
-    //         }
-    //     } catch (error) {
-    //         console.error('Logout error:', error);
-    //         // Продолжаем очистку локального хранилища даже если запрос на сервер не удался
-    //     }
-    //     await clearStorage();
-    //     return true;
-    // }
     async refreshToken() {
         const refreshToken = await getRefreshToken();
         if (!refreshToken) {
