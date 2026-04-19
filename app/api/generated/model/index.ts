@@ -32,6 +32,7 @@ export * from './postGetPostsByUserIdParams';
 export * from './postRepostUserDto';
 export * from './postUploadMedia200';
 export * from './profileDto';
+export * from './refreshTokenDto';
 export * from './repostDto';
 export * from './telegramSendMessageDto';
 export * from './telegramSendMessageDtoApp';

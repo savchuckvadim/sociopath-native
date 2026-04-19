@@ -2,7 +2,7 @@ import { AxiosInstance } from 'axios';
 import { getNewTokens } from "@/api/lib/auth/helper-auth.api";
 import { errorCatch } from "@/api/lib/utils/error.util";
 import { removeTokensFromStorage } from "@/api/lib/auth/helper-storage.api";
-import { AUTH_ERRORS, isTokenError } from "@/api/lib/auth/auth-errors.const";
+import { isTokenError } from "@/api/lib/auth/auth-errors.const";
 // import { authGlobalService } from "@/processes/auth/lib/services/auth-global.service";
 
 export const setupRefreshInterceptor = (api: AxiosInstance) => {
