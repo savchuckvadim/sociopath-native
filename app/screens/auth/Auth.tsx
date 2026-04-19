@@ -2,8 +2,8 @@ import { useState } from "react";
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Dimensions } from "react-native";
 import { Svg, Path } from "react-native-svg";
 
-import { AuthForm, LoginForm, RegisterForm } from "@/processes/auth";
-import { colors, Loader } from "@/shared";
+import { AuthForm,  RegisterForm } from "@/processes/auth";
+import {  Loader } from "@/shared";
 import clsx from "clsx";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -59,7 +59,7 @@ export default function Auth() {
                 contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: 20 }}
                 style={styles.scrollView}
             >
-                <View className="max-w-md w-full mx-auto bg-white rounded-lg shadow-lg p-6">
+                <View className="max-w-md w-full mx-auto bg-white rounded-[24px] shadow-lg p-6">
                     {/* Заголовок */}
                     <View className="mb-6">
                         <Text className="text-2xl font-bold text-center text-gray-900 mb-2">
@@ -71,7 +71,7 @@ export default function Auth() {
                     </View>
 
                     {/* Форма */}
-                    {isLogin ? <AuthForm /> : <RegisterForm />}
+                    <AuthForm />
 
                     {/* Переключение между формами */}
                     {!isLogin && <View className="mt-4 flex-row items-center justify-center">

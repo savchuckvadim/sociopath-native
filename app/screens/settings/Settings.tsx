@@ -1,6 +1,6 @@
 import { View, Text, Alert } from "react-native";
 import { Button } from "@/shared";
-import { useAuth } from "@/processes/auth";
+import { useAuth } from "@/processes/auth/lib/hooks/auth.hook";
 import { AuthService } from "@/processes/auth/lib/api/AuthService";
 import { useState } from "react";
 
@@ -42,7 +42,7 @@ export default function Settings() {
     return (
         <View className="flex-1 bg-gray-50 p-4">
             <Text className="text-2xl font-bold mb-6">Настройки</Text>
-            
+
             {user && (
                 <View className="mb-6">
                     <Text className="text-gray-600 mb-2">Пользователь:</Text>
@@ -52,7 +52,7 @@ export default function Settings() {
             )}
 
             <View className="mt-4">
-                <Button 
+                <Button
                     onPress={handleLogout}
                     disabled={isLoading}
                 >

@@ -1,6 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
 import { useUserChats } from '@/entities/chats';
-import { useAuth } from '@/processes/auth';
+import { useAuth } from '@/processes/auth/lib/hooks/auth.hook';
 
 /**
  * Хук для получения общего количества непрочитанных сообщений

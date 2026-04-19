@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { MessageService } from '../api/MessageService';
 import { CreateMessageDto, MessagesGetChatMessagesParams } from '@/api';
-import { useAuth } from '@/processes/auth';
+import { useAuth } from '@/processes/auth/lib/hooks/auth.hook';
 
 export const useChatMessages = (chatId: string, limit?: number, offset?: number) => {
     const { user } = useAuth();

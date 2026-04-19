@@ -4,4 +4,5 @@ export * from './ui/LoginForm/AuthForm';
 
 export * from './providers/AuthProvider';
 export * from './interface/auth-provider.interface';
-export * from './lib/hooks/auth.hook';
+
+export * from './lib/hooks/auth-check.hook';

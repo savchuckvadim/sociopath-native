@@ -1,6 +1,6 @@
 import { View, Text, Image } from "react-native";
 import { useProfile } from "@/entities/profile";
-import { useAuth } from "@/processes/auth";
+import { useAuth } from "@/processes/auth/lib/hooks/auth.hook";
 import { Button, Loader, LoadingComponent } from "@/shared";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { useUserChats, ChatType, CreateChat, useCreateChat } from "@/entities/chats";

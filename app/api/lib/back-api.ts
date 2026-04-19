@@ -3,14 +3,15 @@ import { Platform } from 'react-native';
 import { SERVER_URL } from '@/config/api.config';
 
 console.log('back-api SERVER_URL', SERVER_URL);
-
+debugger
 // Для Android эмулятора localhost не работает, нужно использовать 10.0.2.2
 // Для iOS эмулятора localhost работает
 // Для веба используем localhost или SERVER_URL из env
 const getBaseUrl = () => {
     // baseURL должен быть БЕЗ /api, так как все запросы уже содержат /api в пути
-    return "https://api.sociopath-network.ru"
-    // let baseUrl = SERVER_URL || 'http://localhost:3000';
+    const baseUrl = SERVER_URL || "http://10.0.2.2:3000"// 'http://10.0.2.2:3000'  //|| SERVER_URL ||;
+    return baseUrl;
+    // let baseUrl = SERVER_URL || 'http://127.0.0.1:3000';
 
     // // Для Android эмулятора заменяем localhost/127.0.0.1 на 10.0.2.2
     // if (Platform.OS === 'android') {
@@ -54,6 +55,7 @@ export const $api = axios.create({
 // Импортируем функции установки интерцепторов (не сами интерцепторы)
 import { setupTokenInterceptor } from './interceptors/with-token.interceptor';
 import { setupRefreshInterceptor } from './interceptors/refresh.interceptor';
+import { setupErrorToastInterceptor } from './interceptors/error-toast.interceptor';
 
 
 // // // 🔐 автоматически добавляем JWT
@@ -92,8 +94,10 @@ import { setupRefreshInterceptor } from './interceptors/refresh.interceptor';
 // });
 
 
+// Порядок важен: сначала token, потом refresh, потом error toast
 setupTokenInterceptor($api);
 setupRefreshInterceptor($api);
+setupErrorToastInterceptor($api); // Должен быть последним, чтобы обрабатывать все ошибки
 export const customAxios = async<T>({
     url,
     method,
@@ -138,6 +142,6 @@ export const customAxios = async<T>({
             } : 'No response',
             url: fullUrl,
         });
-        throw error;
+        throw error?.response?.data || error;
     }
 };

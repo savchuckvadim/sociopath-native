@@ -11,6 +11,8 @@ export const AUTH_ERRORS = {
     TOKEN_EXPIRED: 'Token expired',
     /** Refresh token отсутствует в запросе */
     NO_REFRESH_TOKEN: 'No refresh token',
+
+    INVALID_REFRESH_TOKEN: 'Invalid refresh token',
 } as const;
 
 /**
@@ -26,6 +28,7 @@ export const isTokenError = (errorMessage: string): boolean => {
         errorMessage === AUTH_ERRORS.ACCESS_TOKEN_EXPIRED ||
         errorMessage === AUTH_ERRORS.REFRESH_TOKEN_NOT_FOUND ||
         errorMessage === AUTH_ERRORS.TOKEN_EXPIRED ||
-        errorMessage === AUTH_ERRORS.NO_REFRESH_TOKEN
+        errorMessage === AUTH_ERRORS.NO_REFRESH_TOKEN ||
+        errorMessage === AUTH_ERRORS.INVALID_REFRESH_TOKEN
     );
 };

@@ -1,16 +1,4 @@
-// import { ScreenContent } from 'components/ScreenContent';
-// import { StatusBar } from 'expo-status-bar';
 
-// import './global.css';
-
-// export default function App() {
-//   return (
-//     <>
-//       <ScreenContent title="Home" path="App.tsx"></ScreenContent>
-//       <StatusBar style="auto" />
-//     </>
-//   );
-// }
 // eas build --platform ios
 // eas submit --platform ios
 import { Navigation } from '@/processes/navigation/ui/Navigation';
@@ -19,8 +7,8 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import './global.css';
 import { AuthProvider } from '@/processes/auth/providers/AuthProvider';
-// import Camera from '@/components/camera/Camera';
-import { Text, View } from 'react-native';
+import { GlobalCallProvider } from '@/entities/call';
+
 import { Toast } from '@/shared';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -47,11 +35,13 @@ export default function App() {
     return <QueryClientProvider client={queryClient}>
         <SafeAreaProvider>
             <AuthProvider>
-                <SafeAreaView style={{ flex: 1 }} edges={['top']}>
-                    <StatusBar style="dark" />
-                    <Navigation />
-                </SafeAreaView>
-                <Toast />
+                <GlobalCallProvider>
+                    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }} edges={['top']}>
+                        <StatusBar style="dark"  />
+                        <Navigation />
+                    </SafeAreaView>
+                    <Toast />
+                </GlobalCallProvider>
             </AuthProvider>
         </SafeAreaProvider>
     </QueryClientProvider>;

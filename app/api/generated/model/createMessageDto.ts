@@ -5,7 +5,33 @@
  * API for auth backend for monorepo
  * OpenAPI spec version: 1.0
  */
+import type { CreateMessageDtoType } from './createMessageDtoType';
 
 export interface CreateMessageDto {
-  [key: string]: unknown;
+  /** Chat ID */
+  chatId: string;
+  /** Content */
+  content: string;
+  /** Type */
+  type?: CreateMessageDtoType;
+  /**
+   * File URL
+   * @nullable
+   */
+  fileUrl?: string | null;
+  /**
+   * File Name
+   * @nullable
+   */
+  fileName?: string | null;
+  /**
+   * File Size
+   * @nullable
+   */
+  fileSize?: number | null;
+  /**
+   * Reply To ID
+   * @nullable
+   */
+  replyToId?: string | null;
 }

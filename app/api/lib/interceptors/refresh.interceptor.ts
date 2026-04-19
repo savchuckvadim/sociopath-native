@@ -3,6 +3,7 @@ import { getNewTokens } from "@/api/lib/auth/helper-auth.api";
 import { errorCatch } from "@/api/lib/utils/error.util";
 import { removeTokensFromStorage } from "@/api/lib/auth/helper-storage.api";
 import { AUTH_ERRORS, isTokenError } from "@/api/lib/auth/auth-errors.const";
+// import { authGlobalService } from "@/processes/auth/lib/services/auth-global.service";
 
 export const setupRefreshInterceptor = (api: AxiosInstance) => {
     api.interceptors.response.use((config) => {
@@ -26,8 +27,11 @@ export const setupRefreshInterceptor = (api: AxiosInstance) => {
         });
 
         // Обрабатываем только 401 ошибки (не Network Error)
-        if (error.response?.status === 401 && !originalRequest._isRetry) {
+        // И только если не идет процесс logout
+        if (error.response?.status === 401 && !originalRequest._isRetry ) {
             originalRequest._isRetry = true;
+            // Помечаем оригинальную ошибку, чтобы не показывать Toast (будет обработана через refresh)
+            (originalRequest as any)._skipErrorToast = true;
 
             console.log('🔄 Refresh interceptor: Attempting to refresh token...');
             try {
@@ -64,13 +68,24 @@ export const setupRefreshInterceptor = (api: AxiosInstance) => {
                     console.log('🔄 Refresh interceptor: Refresh token invalid/expired, removing tokens...');
                     await removeTokensFromStorage();
                     console.log('🔄 Refresh interceptor: Tokens removed');
-                    console.log('🔄 Refresh interceptor: NOTE - setUser(null) should be called elsewhere (e.g., in useAuthCheck)');
+
+                    // Вызываем глобальный сервис для принудительного logout
+                    // Это вызовет setUser(null) и автоматически произойдет редирект на логин
+                    // await authGlobalService.forceLogout('Refresh token invalid/expired');
+
+                    console.log('🔄 Refresh interceptor: Force logout called, redirect to login will happen');
                     console.log('🔄 Refresh interceptor: Throwing error to prevent retry...');
+                    // Помечаем ошибку, чтобы не показывать Toast
+                    (refreshError.config as any) = (refreshError.config || {});
+                    (refreshError.config as any)._skipErrorToast = true;
                     // Не перезапрашиваем, если refresh token тоже истек
                     throw refreshError;
                 }
 
                 console.log('🔄 Refresh interceptor: Unknown error, throwing...');
+                // Помечаем ошибку, чтобы не показывать Toast для refresh ошибок
+                (refreshError.config as any) = (refreshError.config || {});
+                (refreshError.config as any)._skipErrorToast = true;
                 throw refreshError;
             }
         }

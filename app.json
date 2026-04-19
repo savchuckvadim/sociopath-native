@@ -30,7 +30,7 @@
             ]
         ],
         "orientation": "portrait",
-        "icon": "./assets/icon-sociopath.png",
+        "icon": "./assets/icon.png",
         "userInterfaceStyle": "light",
         "splash": {
             "image": "./assets/splash.png",

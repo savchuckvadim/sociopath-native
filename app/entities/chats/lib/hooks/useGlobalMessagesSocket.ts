@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { connectMessagesSocket } from '@/shared/lib/socket/messages-socket';
 import { Message } from '@/entities/messages';
 import { playMessageSound } from '@/shared/lib/notifications/sound-notification';
-import { useAuth } from '@/processes/auth';
+import { useAuth } from '@/processes/auth/lib/hooks/auth.hook';
 
 /**
  * Глобальный хук для прослушивания всех сообщений через WebSocket

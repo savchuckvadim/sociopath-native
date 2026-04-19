@@ -1,5 +1,5 @@
 import { Text, TouchableOpacity, StyleSheet } from "react-native";
-import { useAuth } from "@/processes";
+import { useAuth } from "@/processes/auth/lib/hooks/auth.hook";
 import { useTypedNavigation } from "@/hooks/typed-navigation.hook";
 import { colors } from "@/shared/style/colors";
 

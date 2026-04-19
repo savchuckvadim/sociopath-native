@@ -1,6 +1,6 @@
 import { View } from "react-native";
 import { Users } from "@/entities/user";
-import { useAuth } from "@/processes/auth";
+import { useAuth } from "@/processes/auth/lib/hooks/auth.hook";
 import { Loader } from "@/shared";
 
 export default function People() {

@@ -3,6 +3,7 @@ import { IAuthContext, TypeUserState } from "../interface/auth-provider.interfac
 import * as SplashScreen from 'expo-splash-screen';
 import { IUser } from "@/entities/user";
 import { getAccessToken, getUserFromStorage } from "@/api/lib/auth/helper-storage.api";
+// import { authGlobalService } from "../lib/services/auth-global.service";
 
 // Set the animation options. This is optional.
 // SplashScreen.setOptions({
@@ -20,6 +21,10 @@ export const AuthProvider: FC<PropsWithChildren<unknown>> = ({ children }) => {
     useEffect(
         () => {
             let isMonted = true;
+
+            // Регистрируем setUser в глобальном сервисе для доступа из interceptors
+            // authGlobalService.registerSetUser(setUser);
+
             const checkAccessToken = async () => {
                 try {
                     const accessToken = await getAccessToken();
@@ -39,6 +44,8 @@ export const AuthProvider: FC<PropsWithChildren<unknown>> = ({ children }) => {
 
             return () => {
                 isMonted = false;
+                // Удаляем регистрацию при размонтировании
+                // authGlobalService.unregisterSetUser();
             }
         },
         []

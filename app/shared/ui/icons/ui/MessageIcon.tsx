@@ -1,0 +1,48 @@
+'use client'
+import React, { useState } from 'react'
+import { EIconColor } from '../type/icon-type';
+import { useTheme } from 'next-themes';
+
+
+interface MessageIconProps {
+    size?: number;
+    color?: EIconColor;
+}
+
+export default function MessageIcon({ size, color = EIconColor.RED }: MessageIconProps) {
+
+
+    const [isHovered, setIsHovered] = useState(false);
+    const { theme } = useTheme()
+    const iconColor = isHovered ? EIconColor.RED : theme?.includes('dark') ? EIconColor.LIGHT : EIconColor.DARK;
+
+    return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8.12012 20H12.0001"
+                stroke={color || iconColor}
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round" />
+            <path d="M8.26401 20H4.92501C4.10201 20 3.69001 19.005 4.27201 18.424L5.36201 17.334"
+                stroke={color || iconColor}
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round" />
+            <path d="M4 12C4 7.582 7.582 4 12 4C16.418 4 20 7.582 20 12C20 16.418 16.418 20 12 20"
+                stroke={color || iconColor}
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round" />
+            <path d="M5.73011 16.96L5.36011 17.33"
+                stroke={color || iconColor}
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round" />
+            <path d="M5.733 16.963C4.651 15.599 4 13.877 4 12"
+                stroke={color || iconColor}
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round" />
+        </svg>
+    )
+}

@@ -5,7 +5,7 @@ import { Message } from '@/entities/messages';
 import { scrollToBottom } from '@/entities/messages/lib/utils/scroll-to-bottom.util';
 import { RefObject } from 'react';
 import { ScrollView } from 'react-native';
-import { useAuth } from '@/processes/auth';
+import { useAuth } from '@/processes/auth/lib/hooks/auth.hook';
 
 interface UseChatSocketProps {
     chatId: string | null;

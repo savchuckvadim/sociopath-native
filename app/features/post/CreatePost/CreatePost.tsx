@@ -1,7 +1,7 @@
 import { View, Text, TextInput, TouchableOpacity, Image, Alert } from "react-native";
 import { useState } from "react";
-import { useAuth } from "@/processes/auth";
-import { Button, Loader } from "@/shared";
+import { useAuth } from "@/processes/auth/lib/hooks/auth.hook";
+import { Button } from "@/shared";
 import { useCreatePost } from "@/entities/posts";
 import { CreatePostDto } from "@/api";
 import * as ImagePicker from 'expo-image-picker';

@@ -1,6 +1,6 @@
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { useState } from 'react';
-import { useAuth } from '@/processes/auth';
+import { useAuth } from '@/processes/auth/lib/hooks/auth.hook';
 import { Loader } from '@/shared';
 import { ChatListWidget } from '@/widgetes/chat';
 import { useUserChats, ChatType, CreateChat, useCreateChat } from '@/entities/chats';

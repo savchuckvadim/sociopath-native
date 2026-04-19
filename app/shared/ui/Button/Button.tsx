@@ -2,7 +2,7 @@ import { FC, PropsWithChildren } from "react"
 import { IButtonProps } from "./button.interface"
 import { Pressable, Text } from "react-native"
 import clsx from "clsx"
-import { colors } from "@/shared/"
+
 
 export const Button: FC<PropsWithChildren<IButtonProps>> = ({
     children,
@@ -15,10 +15,12 @@ export const Button: FC<PropsWithChildren<IButtonProps>> = ({
             className={
                 clsx(
                     'self-center',
-                    'rounded-lg',
+                    'rounded-[16px]',
                     'w-full',
                     'font-light py-3',
                     `bg-[#F44848]`,
+                    'h-14',
+                    'flex-row items-center justify-center',
                     className
                 )
             }

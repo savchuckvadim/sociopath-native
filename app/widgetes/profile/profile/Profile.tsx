@@ -3,7 +3,7 @@ import { ProfileInformation, ProfilePosts } from "@/widgetes/profile";
 
 import { Loader } from "@/shared";
 import { FC } from "react";
-import { useAuth } from "@/processes";
+import { useAuth } from "@/processes/auth/lib/hooks/auth.hook";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export interface IProfileProps {

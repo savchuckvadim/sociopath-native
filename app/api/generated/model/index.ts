@@ -13,6 +13,7 @@ export * from './chatDto';
 export * from './chatMemberDto';
 export * from './createChatDto';
 export * from './createMessageDto';
+export * from './createMessageDtoType';
 export * from './createPostDto';
 export * from './createUserDto';
 export * from './errorResponseDto';

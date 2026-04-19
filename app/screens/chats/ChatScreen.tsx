@@ -1,6 +1,6 @@
 import { View, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { useState, useEffect, useRef } from 'react';
-import { useAuth } from '@/processes/auth';
+import { useAuth } from '@/processes/auth/lib/hooks/auth.hook';
 import { Loader } from '@/shared';
 import { ChatMessagesWidget, ChatInputWidget } from '@/widgetes/chat';
 import { useUserChats, useMarkChatAsRead, useChatSocket, useSendMessage, Chat } from '@/entities/chats';
@@ -8,11 +8,12 @@ import { scrollToBottom } from '@/entities/messages/lib/utils/scroll-to-bottom.u
 import { useRoute, RouteProp, useNavigation, NavigationProp } from '@react-navigation/native';
 import { TypeRootStackParamList } from '@/processes/navigation/interface/navigation.interface';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ChatMemberDto } from '@/api';
+import { ChatMemberDto } from '@/api/generated/model';
 
 type ChatScreenRouteProp = RouteProp<TypeRootStackParamList, 'Chat'>;
 
 export default function ChatScreen() {
+
     const { user } = useAuth();
     const route = useRoute<ChatScreenRouteProp>();
     const navigation = useNavigation<NavigationProp<TypeRootStackParamList>>();
@@ -108,14 +109,16 @@ export default function ChatScreen() {
                 />
             </View>
             {chatId && (
-                <View style={{ paddingBottom: insets.bottom }}>
+                <View >
                     <ChatInputWidget
+                        chatId={chatId || ''}
+                        otherUserId={otherMember?.userId || ''}
                         messageText={messageText}
                         onMessageTextChange={setMessageText}
                         onSendMessage={handleSendMessage}
                         isPending={isSendingMessage}
                         onAudioCall={handleAudioCall}
-                        onVideoCall={handleVideoCall}
+                        // onVideoCall={handleVideoCall}
                     />
                 </View>
             )}

@@ -6,6 +6,8 @@ export interface IAuthFormData extends Pick<UserDto, 'email' | 'name'> {
     confirmPassword: string;
 }
 
+
+//TODO: удалить этот интерфейс
 export interface IRegisterForm extends CreateUserDto {
 
     name: string;
@@ -15,7 +17,7 @@ export interface IRegisterForm extends CreateUserDto {
 
 
 }
-
+//TODO: удалить этот интерфейс
 export interface ILoginForm extends LoginDto {
 
     email: string;

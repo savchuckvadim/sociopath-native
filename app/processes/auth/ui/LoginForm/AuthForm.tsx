@@ -17,7 +17,7 @@ export const AuthForm = () => {
             name: ""
         }
     })
-    const { login, registration, isLoading } = useAuthMutations(reset);
+    const { login, registration, isLoading, loginError, registrationError } = useAuthMutations(reset);
     const onSubmit: SubmitHandler<IAuthFormData> = (data) => {
         console.log('onSubmit', data);
         if (isReg) {
@@ -37,7 +37,9 @@ export const AuthForm = () => {
 
     return (
         <>
-            <AuthFields control={control} />
+            {loginError && <Text className="text-red-500">{loginError.message}</Text>}
+            {registrationError && <Text className="text-red-500">{registrationError.message}</Text>}
+            <AuthFields control={control} isRegister={isReg} />
 
             <Button
                 onPress={handleSubmit(onSubmit)}

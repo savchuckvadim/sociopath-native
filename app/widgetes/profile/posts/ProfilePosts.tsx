@@ -1,9 +1,9 @@
 import { View, Text, ScrollView, Image, StyleSheet } from "react-native";
 import { usePostsByUserId } from "@/entities/posts";
-import { useAuth } from "@/processes/auth";
+import { useAuth } from "@/processes/auth/lib/hooks/auth.hook";
 import { Loader, Empty, LoadingComponent } from "@/shared";
-import { Video, ResizeMode } from "expo-av";
 import CreatePost from "@/features/post/CreatePost/CreatePost";
+import Post from "./Post";
 
 interface ProfilePostsProps {
     userId: string;
@@ -36,47 +36,7 @@ export default function ProfilePosts({ userId }: ProfilePostsProps) {
                     <Empty text={NO_POST_MESSAGE} />
                 ) : (
                     posts.map((post) => (
-                        <View key={post.id} className="mb-4 p-4 bg-white rounded-2xl border border-gray-200">
-                            {post.originalPostId && (
-                                <View className="mb-2">
-                                    <Text className="text-xs text-gray-500">Reposted</Text>
-                                </View>
-                            )}
-                            {post.text && (
-                                <Text className="text-gray-900 mb-2">{post.text}</Text>
-                            )}
-                            {post.image && typeof post.image === 'string' && post.image.trim() !== '' && (
-                                <View className="mb-2" style={styles.mediaContainer}>
-                                    <Image
-                                        source={{ uri: post.image }}
-                                        style={styles.image}
-                                        resizeMode="cover"
-                                        onError={(error) => {
-                                            console.error('Image load error:', error.nativeEvent.error);
-                                            console.error('Image URL:', post.image);
-                                        }}
-                                        onLoad={() => {
-                                            console.log('Image loaded successfully:', post.image);
-                                        }}
-                                    />
-                                </View>
-                            )}
-                            {post.video && typeof post.video === 'string' && post.video.trim() !== '' && (
-                                <View className="mb-2" style={styles.mediaContainer}>
-                                    <Video
-                                        source={{ uri: post.video }}
-                                        style={styles.video}
-                                        useNativeControls
-                                        resizeMode={ResizeMode.CONTAIN}
-                                        isLooping={false}
-                                    />
-                                </View>
-                            )}
-                            <View className="flex-row gap-4 mt-2">
-                                <Text className="text-gray-500 text-sm">❤️ {post.likesCount}</Text>
-                                <Text className="text-gray-500 text-sm">💬 {post.repostsCount}</Text>
-                            </View>
-                        </View>
+                        <Post key={post.id} post={post} />
                     ))
                 )}
             </ScrollView>

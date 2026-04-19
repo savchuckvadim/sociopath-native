@@ -1,6 +1,6 @@
 import { View, ScrollView, Text } from "react-native";
 import { ProfileInformation, ProfilePosts } from "@/widgetes/profile";
-import { useAuth } from "@/processes/auth";
+import { useAuth } from "@/processes/auth/lib/hooks/auth.hook";
 import { LoadingComponent } from "@/shared";
 
 export default function Me() {

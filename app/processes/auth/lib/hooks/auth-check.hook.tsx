@@ -1,4 +1,4 @@
-import { useAuth } from "@/processes";
+import { useAuth } from "@/processes/auth/lib/hooks/auth.hook";
 import { useEffect } from "react";
 import { AuthService } from "../api/AuthService";
 import { getAccessToken } from "@/api/lib/auth/helper-storage.api";
@@ -7,8 +7,13 @@ import { getNewTokens } from "@/api/lib/auth/helper-auth.api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { EnumAuthType } from "@/api/lib/auth/auth.type";
 import { AUTH_ERRORS, isTokenError } from "@/api/lib/auth/auth-errors.const";
+import { NavigationProp, CommonActions, NavigationContainerRef } from "@react-navigation/native";
+import { TypeRootStackParamList } from "@/processes/navigation/interface/navigation.interface";
 
-export const useAuthCheck = (roteName?: string) => {
+export const useAuthCheck = (
+    roteName?: string,
+    navigationRef?: NavigationContainerRef<NavigationProp<TypeRootStackParamList>>
+) => {
     const { user, setUser } = useAuth();
 
 
@@ -58,8 +63,24 @@ export const useAuthCheck = (roteName?: string) => {
             setUser(null);
             console.log('🔍 useAuthCheck: Logout completed, user cleared');
             return;
+        } else if (!refreshToken && !user) {
+            // Редирект на экран Auth, если нет токена и пользователя
+            if (navigationRef?.isReady()) {
+                console.log('🔍 useAuthCheck: No refresh token and user not exists, redirecting to Auth...');
+                navigationRef.dispatch(
+                    CommonActions.reset({
+                        index: 0,
+                        routes: [{ name: 'Auth' }],
+                    })
+                );
+            } else {
+                console.log('🔍 useAuthCheck: No refresh token and user not exists, navigation ref not ready');
+            }
+            return;
+        } else {
+            console.log('🔍 useAuthCheck: Refresh token and user exists, not logging out');
+            return;
         }
-        console.log('🔍 useAuthCheck: checkRefreshToken completed');
     }
     useEffect(() => {
         checkAuth();

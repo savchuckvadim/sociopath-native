@@ -1,5 +1,7 @@
 import { View, Text, Image } from 'react-native';
 import { Message } from '../../lib/types/messages.types';
+import { UserAvatar } from '@/shared';
+import { useUser } from '@/entities/user';
 
 interface MessageItemProps {
     message: Message;
@@ -8,6 +10,8 @@ interface MessageItemProps {
 }
 
 export const MessageItem = ({ message, isOwn, showAvatar = true }: MessageItemProps) => {
+
+  const { user } = useUser(message.sender?.id || '');
     const formatTime = (dateString: string) => {
         const date = new Date(dateString);
         return date.toLocaleTimeString('ru-RU', {
@@ -18,16 +22,16 @@ export const MessageItem = ({ message, isOwn, showAvatar = true }: MessageItemPr
 
     return (
         <View className={`flex-row gap-3 mb-4 ${isOwn ? 'flex-row-reverse' : 'flex-row'}`}>
-            {showAvatar && !isOwn && (
-                <View className="w-8 h-8 rounded-full bg-gray-300 items-center justify-center">
-                    {message.sender?.name ? (
-                        <Text className="text-xs font-bold text-gray-600">
-                            {message.sender.name.charAt(0).toUpperCase()}
-                        </Text>
-                    ) : (
-                        <Text className="text-xs font-bold text-gray-600">U</Text>
-                    )}
-                </View>
+            {showAvatar && !isOwn && ( <UserAvatar user={user} />
+                // <View className="w-8 h-8 rounded-full bg-gray-300 items-center justify-center">
+                //     {message.sender?.name ? (
+                //         <Text className="text-xs font-bold text-gray-600">
+                //             {message.sender.name.charAt(0).toUpperCase()}
+                //         </Text>
+                //     ) : (
+                //         <Text className="text-xs font-bold text-gray-600">U</Text>
+                //     )}
+                // </View>
             )}
             <View className={`flex flex-col ${isOwn ? 'items-end' : 'items-start'} ${showAvatar && !isOwn ? 'max-w-[75%]' : 'max-w-[70%]'}`}>
                 {!isOwn && showAvatar && (

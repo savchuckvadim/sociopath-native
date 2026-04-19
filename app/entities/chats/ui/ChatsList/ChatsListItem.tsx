@@ -1,8 +1,11 @@
 import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { ChatMemberDto, ChatType } from '../../lib/types/chats.types';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
-import { ChatDto } from '@/api';
+import { ChatDto, UserDto } from '@/api';
 import { TypeRootStackParamList } from '@/processes/navigation/interface/navigation.interface';
+import { Avatar, UserAvatar } from '@/shared';
+import { usePresence } from '@/entities/presence';
+import { useEffect, useState } from 'react';
 
 interface ChatsListItemProps {
     chat: ChatDto;
@@ -10,7 +13,9 @@ interface ChatsListItemProps {
 }
 
 export const ChatsListItem = ({ chat, currentUserId }: ChatsListItemProps) => {
+    const [otherMember, setOtherMember] = useState<UserDto | undefined>(undefined);
     const navigation = useNavigation<NavigationProp<TypeRootStackParamList>>();
+    const { getIsUserOnline } = usePresence();
 
     const handleChatSelect = (chatId: string) => {
         navigation.navigate('Chat', { chatId });
@@ -19,7 +24,11 @@ export const ChatsListItem = ({ chat, currentUserId }: ChatsListItemProps) => {
     const otherMembers = chat.members?.filter(
         (m: ChatMemberDto) => m.userId !== currentUserId
     ) || [];
-
+    useEffect(() => {
+        if (otherMembers.length > 0) {
+            setOtherMember(otherMembers[0]?.user);
+        }
+    }, [otherMembers]);
     const chatName =
         chat.type === ChatType.PRIVATE || chat.type === 'PRIVATE'
             ? otherMembers[0]?.user?.name || 'Пользователь'
@@ -35,19 +44,10 @@ export const ChatsListItem = ({ chat, currentUserId }: ChatsListItemProps) => {
             className="bg-white flex-row items-center gap-3 p-4 rounded-xl mb-2"
         >
             <View className="relative">
-                <View className="w-12 h-12 rounded-full bg-gray-300 items-center justify-center">
-                    {chat.avatar ? (
-                        <Image
-                            source={{ uri: chat.avatar }}
-                            className="w-full h-full rounded-full"
-                            resizeMode="cover"
-                        />
-                    ) : (
-                        <Text className="text-lg font-bold text-gray-600">
-                            {chatName.charAt(0).toUpperCase()}
-                        </Text>
-                    )}
-                </View>
+
+                <UserAvatar user={otherMember} size="sm" />
+              
+
             </View>
             <View className="flex-1 min-w-0">
                 <Text className="font-medium text-sm" numberOfLines={1}>{chatName}</Text>

@@ -23,24 +23,9 @@ import { useCallToken } from '../lib/hooks/call-token.hook';
 import { Loader } from '@/shared';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { TypeRootStackParamList } from '@/processes/navigation/interface/navigation.interface';
+import { LIVEKIT_URL } from '@/config/api.config';
 
-// !! Note !!
-// This sample hardcodes a token which expires in 2 hours.
-// LiveKit автоматически преобразует https:// в wss:// для WebSocket
-// И добавляет путь /rtc для сигнального соединения
-// const LIVEKIT_URL = 'https://sociopath-livekit-cf4g84-e253d2-109-69-19-219.traefik.me/';
 
-// Альтернативные домены из Traefik (если основной не работает):
-const LIVEKIT_URL = 'https://ws.sociopath-network.ru/';
-// const LIVEKIT_URL = 'https://ws1.sociopath-network.ru/';
-// const LIVEKIT_URL = 'https://ws2.sociopath-network.ru/';
-
-// LiveKit формирует WebSocket URL так:
-// - Берет serverUrl (https://domain/)
-// - Преобразует в wss://domain/rtc
-// - Или wss://domain/ если настроено иначе
-console.log('🔵 LiveKit URL configured:', LIVEKIT_URL);
-console.log('🔵 Expected WebSocket URL:', LIVEKIT_URL.replace('https://', 'wss://').replace(/\/$/, '') + '/rtc');
 
 type CallScreenRouteProp = RouteProp<TypeRootStackParamList, 'Call'>;
 

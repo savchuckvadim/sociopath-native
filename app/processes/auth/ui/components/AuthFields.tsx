@@ -6,15 +6,28 @@ import { Field } from "@/shared/";
 export interface IAuthFields {
 
     control: Control<IAuthFormData>;
+    isRegister?: boolean;
 
 }
 
 
 
-export const AuthFields = ({ control }: IAuthFields) => {
+export const AuthFields = ({ control, isRegister }: IAuthFields) => {
     const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return (
         <>
+            {
+                isRegister && (
+                    <Field<IAuthFormData>
+                        control={control}
+                        name="name"
+                        placeholder="Name"
+                        rules={{
+                            required: "Name is required"
+                        }}
+                    />
+                )
+            }
             <Field<IAuthFormData>
                 control={control}
                 name="email"
@@ -42,16 +55,13 @@ export const AuthFields = ({ control }: IAuthFields) => {
                     }
                 }}
             />
-            {/* <Field<IAuthFormData> control={control}
+            {isRegister && <Field<IAuthFormData> control={control}
                 name="confirmPassword"
                 placeholder="Confirm Password"
                 rules={{
                     required: "Confirm Password is required",
-                    validate: (value) => {
-                        if (value !== password) {
-                            return "Passwords do not match";
-                        }
-                        return true;
+                    validate: (value, formValues) => {
+                        return value === formValues.password || "Passwords do not match";
                     },
                     minLength: {
                         value: 6,
@@ -60,7 +70,7 @@ export const AuthFields = ({ control }: IAuthFields) => {
 
                 }}
 
-            /> */}
+            />}
         </>
 
     )

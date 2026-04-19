@@ -10,7 +10,7 @@ export const useAuthMutations = (
 ) => {
     const { setUser } = useAuth();
     const authService = new AuthService();
-    const { mutate: loginSync, isPending: isLoginLoading } = useMutation({
+    const { mutate: loginSync, isPending: isLoginLoading, error: loginError } = useMutation({
         mutationKey: ['login'],
         mutationFn: ({ email, password }: IAuthFormData) => authService.login(email, password),
         onSuccess: (data) => {
@@ -22,7 +22,7 @@ export const useAuthMutations = (
         },
     });
 
-    const { mutate: registrationSync, isPending: isRegistrationLoading } = useMutation({
+    const { mutate: registrationSync, isPending: isRegistrationLoading, error: registrationError } = useMutation({
         mutationKey: ['registration'],
         mutationFn: ({ email, password, name }: IAuthFormData) => authService.registration({ email, password, name }),
         onSuccess: (data) => {
@@ -38,10 +38,12 @@ export const useAuthMutations = (
 
     return  useMemo(() => ({
         login: loginSync,
-      
+
         isLoginLoading,
         registration: registrationSync, isRegistrationLoading,
         isLoading: isLoginLoading || isRegistrationLoading,
-    }), [loginSync, registrationSync, isLoginLoading, isRegistrationLoading]);
+        loginError,
+        registrationError,
+    }), [loginSync, registrationSync, isLoginLoading, isRegistrationLoading, loginError, registrationError]);
 }
 

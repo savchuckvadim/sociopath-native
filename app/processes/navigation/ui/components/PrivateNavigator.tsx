@@ -2,7 +2,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { TypeRootStackParamList } from "../../interface/navigation.interface";
 import { routes } from "../routes";
 import { IRoute } from "../../interface/navigation.interface";
-import { useAuth } from "@/processes/auth";
+import { useAuth } from "@/processes/auth/lib/hooks/auth.hook";
 import { Auth } from "@/screens";
 
 

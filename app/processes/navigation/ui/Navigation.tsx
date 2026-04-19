@@ -1,11 +1,14 @@
 import { NavigationContainer, NavigationProp, useNavigationContainerRef } from "@react-navigation/native";
 import { TypeRootStackParamList } from "../interface/navigation.interface";
 import { PrivateNavigator } from "./components/PrivateNavigator";
-import { BottomMenu } from "@/shared";
-import { useAuth } from "@/processes/auth";
+
+import { useAuth } from "@/processes/auth/lib/hooks/auth.hook";
 import { useEffect, useState } from "react";
 import { useAuthCheck } from "@/processes/auth/lib/hooks/auth-check.hook";
 import { useGlobalMessagesSocket } from "@/entities/chats/lib/hooks/useGlobalMessagesSocket";
+import { usePresenceSocket } from "@/entities/presence";
+import { CallWrapperWidget } from "@/widgetes/call/CallWrapper";
+import { BottomMenu } from "@/widgetes/bottom-menu";
 
 
 export const Navigation = () => {
@@ -22,12 +25,15 @@ export const Navigation = () => {
         });
         return () => navRef.removeListener('state', listener);
     }, []);
-    useAuthCheck(currentRoute);
+    useAuthCheck(currentRoute, navRef);
 
     // Глобальный WebSocket слушатель для уведомлений о сообщениях
     useGlobalMessagesSocket();
+
+    // Глобальный WebSocket слушатель для presence (онлайн/оффлайн статус)
+    usePresenceSocket();
     return (
-        <>
+        <CallWrapperWidget>
             <NavigationContainer ref={navRef}>
                 <PrivateNavigator />
 
@@ -39,6 +45,6 @@ export const Navigation = () => {
                     currentPath={currentRoute}
                 />
             }
-        </>
+        </CallWrapperWidget>
     );
 }

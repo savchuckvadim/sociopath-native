@@ -1,23 +1,23 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { EnumAsynStorage, EnumAuthType, IAuthResponse, ITokens } from './auth.type';
 import { IUser } from '@/entities';
+import { getItemAsync, setItemAsync, deleteItemAsync } from 'expo-secure-store';
 
 
-
-export const getAccessToken = async () => {
-    return (await AsyncStorage.getItem(EnumAuthType.ACCESS_TOKEN)) || null;
+export const getAccessToken = async (): Promise<string | null> => {
+    return (await getItemAsync(EnumAuthType.ACCESS_TOKEN)) || null;
 }
 
-// export const getRefreshToken = async () => {
-//     return (await AsyncStorage.getItem(EnumAuthType.REFRESH_TOKEN) )|| null;
-// }
+export const getRefreshToken = async (): Promise<string | null> => {
+    return (await getItemAsync(EnumAuthType.REFRESH_TOKEN) )|| null;
+}
 
 
 
 export const saveTokensToStorage = async (tokens: ITokens) => {
     try {
-        await AsyncStorage.setItem(EnumAuthType.ACCESS_TOKEN, tokens.accessToken);
-        await AsyncStorage.setItem(EnumAuthType.REFRESH_TOKEN, tokens.refreshToken);
+        await setItemAsync(EnumAuthType.ACCESS_TOKEN, tokens.accessToken);
+        await setItemAsync(EnumAuthType.REFRESH_TOKEN, tokens.refreshToken);
     } catch (error) {
         return null;
     }
@@ -27,8 +27,8 @@ export const saveTokensToStorage = async (tokens: ITokens) => {
 export const removeTokensFromStorage = async () => {
     try {
         console.log('🗑️ removeTokensFromStorage: Removing tokens from storage...');
-        await AsyncStorage.removeItem(EnumAuthType.ACCESS_TOKEN);
-        await AsyncStorage.removeItem(EnumAuthType.REFRESH_TOKEN);
+        await deleteItemAsync(EnumAuthType.ACCESS_TOKEN);
+        await deleteItemAsync(EnumAuthType.REFRESH_TOKEN);
         console.log('🗑️ removeTokensFromStorage: Tokens removed successfully');
     } catch (error) {
         console.error('🗑️ removeTokensFromStorage error:', error);

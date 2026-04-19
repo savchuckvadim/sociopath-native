@@ -5,7 +5,8 @@ import { ChatMemberDto } from '@/api';
 import { Loader } from '@/shared';
 import { useNavigation } from '@react-navigation/native';
 import { Feather } from '@expo/vector-icons';
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
+import { scrollToBottom } from '@/entities/messages/lib/utils/scroll-to-bottom.util';
 
 interface ChatMessagesWidgetProps {
     chatId: string | null;
@@ -26,8 +27,28 @@ export const ChatMessagesWidget = ({
         50,
         0
     );
+    const hasScrolledToBottomRef = useRef(false);
 
     const sortedMessages = messages ? (messages as unknown as Message[]) : [];
+
+    // Сброс флага при смене чата
+    useEffect(() => {
+        hasScrolledToBottomRef.current = false;
+    }, [chatId]);
+
+    // Автоматическая прокрутка к последнему сообщению при первой загрузке
+    useEffect(() => {
+        if (!messagesLoading && sortedMessages.length > 0 && !hasScrolledToBottomRef.current && messagesEndRef.current) {
+            hasScrolledToBottomRef.current = true;
+            // Используем несколько таймаутов для надежности на разных устройствах
+            setTimeout(() => {
+                messagesEndRef.current?.scrollToEnd({ animated: false });
+            }, 100);
+            setTimeout(() => {
+                messagesEndRef.current?.scrollToEnd({ animated: true });
+            }, 300);
+        }
+    }, [messagesLoading, sortedMessages.length, chatId]);
 
     if (!chatId) {
         return (
@@ -48,7 +69,7 @@ export const ChatMessagesWidget = ({
         : selectedChat?.name || 'Групповой чат';
 
     return (
-        <View className="flex flex-col flex-1 overflow-hidden">
+        <View className="flex flex-col flex-1 overflow-hidden h-screen">
             {/* Заголовок чата */}
             <View className="border-b p-4 bg-white flex-shrink-0 flex-row items-center justify-between">
                 <View className="flex-shrink-0 flex-row items-center gap-2">
@@ -78,6 +99,15 @@ export const ChatMessagesWidget = ({
                     ref={messagesEndRef}
                     className="flex-1 p-4"
                     contentContainerStyle={{ flexGrow: 1 }}
+                    onContentSizeChange={() => {
+                        // Автоматическая прокрутка при изменении размера контента (первая загрузка)
+                        if (!hasScrolledToBottomRef.current && sortedMessages.length > 0 && !messagesLoading) {
+                            hasScrolledToBottomRef.current = true;
+                            setTimeout(() => {
+                                messagesEndRef.current?.scrollToEnd({ animated: false });
+                            }, 50);
+                        }
+                    }}
                 >
                     {messagesLoading ? (
                         <Loader />
@@ -85,7 +115,6 @@ export const ChatMessagesWidget = ({
                         <MessageList
                             messages={sortedMessages}
                             currentUserId={currentUserId}
-                            messagesEndRef={messagesEndRef}
                         />
                     )}
                 </ScrollView>

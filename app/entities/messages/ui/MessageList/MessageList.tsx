@@ -1,27 +1,19 @@
-import { View, Text } from 'react-native';
-import { Message, NO_MESSAGES_MESSAGE } from '../../lib/types/messages.types';
+import { View } from 'react-native';
+import { Message } from '../../lib/types/messages.types';
 import { MessageItem } from '../MessageItem';
 
 interface MessageListProps {
     messages: Message[];
     currentUserId: string;
-    messagesEndRef: React.RefObject<any>;
 }
 
-export const MessageList = ({ messages, currentUserId, messagesEndRef }: MessageListProps) => {
-    if (messages.length === 0) {
-        return (
-            <View className="flex-1 items-center justify-center">
-                <Text className="text-gray-500">{NO_MESSAGES_MESSAGE}</Text>
-            </View>
-        );
-    }
-
+export const MessageList = ({ messages, currentUserId }: MessageListProps) => {
     return (
         <View className="flex flex-col">
             {messages.map((message: Message, index) => {
                 const isOwn = message.senderId === currentUserId;
                 const prevMessage = index > 0 ? messages[index - 1] : null;
+                // Показываем аватар, если это первое сообщение или предыдущее сообщение от другого пользователя
                 const showAvatar = !prevMessage || prevMessage.senderId !== message.senderId;
                 return (
                     <MessageItem
@@ -32,7 +24,8 @@ export const MessageList = ({ messages, currentUserId, messagesEndRef }: Message
                     />
                 );
             })}
-            <View ref={messagesEndRef} />
+            {/* Отступ внизу для корректной прокрутки */}
+            <View className="h-5" />
         </View>
     );
 };
