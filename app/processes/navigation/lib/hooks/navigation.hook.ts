@@ -9,15 +9,31 @@ export const useNavigation = () => {
     const [currentRoute, setCurrentRoute] = useState<keyof TypeRootStackParamList | undefined>(undefined);
     const navRef = useNavigationContainerRef<NavigationProp<TypeRootStackParamList>>();
 
+    const normalizeRouteForBottomMenu = (
+        routeName: keyof TypeRootStackParamList | undefined,
+    ): keyof TypeRootStackParamList | undefined => {
+        // Keep "Messages" tab highlighted while user is inside a concrete chat.
+        if (routeName === 'Chat') return 'Messages';
+        return routeName;
+    };
+
     useEffect(() => {
-        setCurrentRoute(navRef.getCurrentRoute()?.name as keyof TypeRootStackParamList);
+        setCurrentRoute(
+            normalizeRouteForBottomMenu(
+                navRef.getCurrentRoute()?.name as keyof TypeRootStackParamList,
+            ),
+        );
 
 
         const listener = navRef.addListener('state', () => {
-            setCurrentRoute(navRef.getCurrentRoute()?.name as keyof TypeRootStackParamList);
+            setCurrentRoute(
+                normalizeRouteForBottomMenu(
+                    navRef.getCurrentRoute()?.name as keyof TypeRootStackParamList,
+                ),
+            );
         });
         return () => navRef.removeListener('state', listener);
-    }, []);
+    }, [navRef]);
     useAuthCheck(currentRoute, navRef);
 
 

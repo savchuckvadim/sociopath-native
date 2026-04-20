@@ -1,11 +1,9 @@
 import { useUserChats } from '@/entities/chats/lib/hooks/useChats';
-import { useAuth } from '@/processes/auth/lib/hooks/auth.hook';
 
 /**
  * Хук для получения общего количества непрочитанных сообщений
  */
 export function useUnreadCount() {
-    const { user } = useAuth();
     const { data: chats } = useUserChats();
 
     const unreadCount = chats?.reduce((total, chat) => {

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChatService } from '../api/ChatService';
+import { MessageService } from '@/entities/messages/lib/api/MessageService';
 import { CreateChatDto, UpdateChatDto, AddMemberDto } from '@/api';
 import { useAuth } from '@/processes/auth/lib/hooks/auth.hook';
 
@@ -74,7 +75,51 @@ export const useMarkChatAsRead = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (chatId: string) => ChatService.markAsRead(chatId),
+        // Keep parity with web client: read state/unread counters are owned by messages endpoints.
+        mutationFn: (chatId: string) => MessageService.markChatAsRead(chatId),
+        onMutate: async (chatId) => {
+            await queryClient.cancelQueries({ queryKey: ['chats', 'user'] });
+            await queryClient.cancelQueries({ queryKey: ['chats', chatId] });
+            await queryClient.cancelQueries({ queryKey: ['messages', 'unread', 'total'] });
+
+            const prevChatsUser = queryClient.getQueryData<unknown[]>(['chats', 'user']);
+            const prevChatById = queryClient.getQueryData<unknown>(['chats', chatId]);
+            const prevTotalUnread = queryClient.getQueryData<number>(['messages', 'unread', 'total']);
+
+            let consumedUnread = 0;
+
+            if (Array.isArray(prevChatsUser)) {
+                const nextChatsUser = prevChatsUser.map((chat: any) => {
+                    if (chat?.id !== chatId) return chat;
+                    const currentUnread = typeof chat?.unreadCount === 'number' ? chat.unreadCount : 0;
+                    consumedUnread = currentUnread;
+                    return { ...chat, unreadCount: 0 };
+                });
+                queryClient.setQueryData(['chats', 'user'], nextChatsUser);
+            }
+
+            if (prevChatById && typeof prevChatById === 'object') {
+                queryClient.setQueryData(['chats', chatId], {
+                    ...(prevChatById as Record<string, unknown>),
+                    unreadCount: 0,
+                });
+            }
+
+            if (typeof prevTotalUnread === 'number' && consumedUnread > 0) {
+                queryClient.setQueryData(
+                    ['messages', 'unread', 'total'],
+                    Math.max(0, prevTotalUnread - consumedUnread),
+                );
+            }
+
+            return { prevChatsUser, prevChatById, prevTotalUnread };
+        },
+        onError: (_error, chatId, context) => {
+            if (!context) return;
+            queryClient.setQueryData(['chats', 'user'], context.prevChatsUser);
+            queryClient.setQueryData(['chats', chatId], context.prevChatById);
+            queryClient.setQueryData(['messages', 'unread', 'total'], context.prevTotalUnread);
+        },
         onSuccess: (_, chatId) => {
             queryClient.invalidateQueries({ queryKey: ['messages', 'chat', chatId] });
             queryClient.invalidateQueries({ queryKey: ['chats', chatId] });

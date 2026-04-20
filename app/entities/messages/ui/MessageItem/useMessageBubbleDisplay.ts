@@ -74,7 +74,8 @@ export function useMessageBubbleDisplay(message: Message, isOwn: boolean) {
         }
       } catch {
         if (!cancelled) {
-          setDisplayContent('[Не удалось расшифровать сообщение]');
+          // Message belongs to another device/session chain: don't show decrypt-error stub in UI.
+          setHideIncomingWrongDevice(true);
         }
       }
     })();

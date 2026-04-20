@@ -14,6 +14,32 @@ import {
 } from '@/entities/messages/lib/utils/incoming-message-cache.util';
 import { ScrollView } from 'react-native';
 
+const NEW_MESSAGE_EVENT_ALIASES = [
+  MessagesWsServerEvent.NEW_MESSAGE,
+  'newMessage',
+  'message:new',
+] as const;
+
+const CHAT_READ_EVENT_ALIASES = [
+  MessagesWsServerEvent.CHAT_READ,
+  'chat:read',
+  'message:read',
+  'message:chatRead',
+] as const;
+
+const CHAT_JOIN_EVENT_ALIASES = [
+  MessagesWsClientEvent.CHAT_JOIN,
+  'joinChat',
+  'chat:subscribe',
+] as const;
+
+const CHAT_LEAVE_EVENT_ALIASES = [
+  MessagesWsClientEvent.CHAT_LEAVE,
+  'leaveChat',
+  'chat:unsubscribe',
+] as const;
+const DEBUG_WS_MESSAGES = typeof __DEV__ !== 'undefined' && __DEV__;
+
 interface UseChatSocketProps {
   chatId: string | null;
   userId: string | undefined;
@@ -35,6 +61,9 @@ export const useChatSocket = ({ chatId, userId, messagesEndRef }: UseChatSocketP
       if (disposedRef.current) {
         return () => undefined;
       }
+      if (DEBUG_WS_MESSAGES) {
+        console.log('🔌 [Chat] socket connected?', messagesSocket.connected, 'id:', messagesSocket.id, 'chatId:', chatId);
+      }
 
       const handleNewMessage = (newMessage: Message) => {
         if (newMessage.chatId === chatId) {
@@ -52,22 +81,39 @@ export const useChatSocket = ({ chatId, userId, messagesEndRef }: UseChatSocketP
         }
       };
 
-      messagesSocket.on(MessagesWsServerEvent.NEW_MESSAGE, handleNewMessage);
+      NEW_MESSAGE_EVENT_ALIASES.forEach((eventName) => {
+        messagesSocket.on(eventName, handleNewMessage);
+        if (DEBUG_WS_MESSAGES) console.log('👂 [Chat] listen:', eventName, 'chatId:', chatId);
+      });
 
       const handleChatRead = (payload: { chatId: string }) => {
         if (payload.chatId === chatId) {
           void queryClient.invalidateQueries({
             queryKey: ['messages', 'chat', chatId],
           });
+          void queryClient.invalidateQueries({ queryKey: ['chats', 'user'] });
+          void queryClient.invalidateQueries({ queryKey: ['messages', 'unread', 'total'] });
         }
       };
-      messagesSocket.on(MessagesWsServerEvent.CHAT_READ, handleChatRead);
+      CHAT_READ_EVENT_ALIASES.forEach((eventName) => {
+        messagesSocket.on(eventName, handleChatRead);
+        if (DEBUG_WS_MESSAGES) console.log('👂 [Chat] listen:', eventName, 'chatId:', chatId);
+      });
+
+      const anyListener = (eventName: string, ...args: unknown[]) => {
+        if (!DEBUG_WS_MESSAGES) return;
+        console.log('📡 [Chat:onAny]', eventName, args[0], 'chatId:', chatId);
+      };
+      messagesSocket.onAny(anyListener);
 
       const joinChat = () => {
-        messagesSocket.emit(MessagesWsClientEvent.CHAT_JOIN, { chatId }, (response: { error?: string } | null) => {
-          if (response?.error) {
-            console.error('Chat join error:', response.error);
-          }
+        CHAT_JOIN_EVENT_ALIASES.forEach((eventName) => {
+          if (DEBUG_WS_MESSAGES) console.log('📤 [Chat] emit join:', eventName, { chatId });
+          messagesSocket.emit(eventName, { chatId }, (response: { error?: string } | null) => {
+            if (response?.error) {
+              console.error('Chat join error:', response.error);
+            }
+          });
         });
       };
 
@@ -84,12 +130,20 @@ export const useChatSocket = ({ chatId, userId, messagesEndRef }: UseChatSocketP
       messagesSocket.on('reconnect', joinChat);
 
       return () => {
-        messagesSocket.off(MessagesWsServerEvent.NEW_MESSAGE, handleNewMessage);
-        messagesSocket.off(MessagesWsServerEvent.CHAT_READ, handleChatRead);
+        NEW_MESSAGE_EVENT_ALIASES.forEach((eventName) => {
+          messagesSocket.off(eventName, handleNewMessage);
+        });
+        CHAT_READ_EVENT_ALIASES.forEach((eventName) => {
+          messagesSocket.off(eventName, handleChatRead);
+        });
         messagesSocket.off('reconnect', joinChat);
         if (chatId) {
-          messagesSocket.emit(MessagesWsClientEvent.CHAT_LEAVE, { chatId });
+          CHAT_LEAVE_EVENT_ALIASES.forEach((eventName) => {
+            if (DEBUG_WS_MESSAGES) console.log('📤 [Chat] emit leave:', eventName, { chatId });
+            messagesSocket.emit(eventName, { chatId });
+          });
         }
+        messagesSocket.offAny(anyListener);
       };
     };
 

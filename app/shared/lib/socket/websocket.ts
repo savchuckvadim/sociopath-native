@@ -1,8 +1,8 @@
 import { io, Socket } from 'socket.io-client';
 import { getAccessToken } from '@/api/lib/auth/helper-storage.api';
+import { SOCKET_URL } from '@/config/api.config';
 
 let callsSocket: Socket | null = null;
-const SOCKET_URL = process.env.EXPO_PUBLIC_API_URL || 'https://api.sociopath-network.ru';
 
 export const connectWebSocket = async (userId: string): Promise<Socket> => {
     if (callsSocket?.connected) {

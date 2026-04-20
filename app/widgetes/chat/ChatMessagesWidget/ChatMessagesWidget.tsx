@@ -3,7 +3,7 @@ import type { Chat } from '@/entities/chats/lib/types/chats.types';
 import { MessageList } from '@/entities/messages/ui/MessageList';
 import { NO_MESSAGES_MESSAGE } from '@/entities/messages/lib/types/messages.types';
 import { ChatDtoType } from '@/api';
-import { Loader } from '@/shared';
+import { LoadingComponent } from '@/shared';
 import { Feather } from '@expo/vector-icons';
 import { SecretChatSettingsMenu } from '../SecretChatSettingsMenu/SecretChatSettingsMenu';
 import { useChatMessagesWidget } from './useChatMessagesWidget';
@@ -73,7 +73,11 @@ export const ChatMessagesWidget = ({
         {chatId && isSignal ? <SecretChatSettingsMenu chatId={chatId} /> : null}
       </View>
 
-      {sortedMessages.length === 0 ? (
+      {messagesLoading ? (
+        <View className="flex-1 bg-gray-50 items-center justify-center">
+          <LoadingComponent compact />
+        </View>
+      ) : sortedMessages.length === 0 ? (
         <View className="flex-1 bg-gray-50 items-center justify-center">
           <Text className="text-gray-500">{NO_MESSAGES_MESSAGE}</Text>
         </View>
@@ -91,15 +95,11 @@ export const ChatMessagesWidget = ({
             }
           }}
         >
-          {messagesLoading ? (
-            <Loader />
-          ) : (
-            <MessageList
-              messages={sortedMessages}
-              currentUserId={currentUserId}
-              onRetryFailed={onRetryFailed}
-            />
-          )}
+          <MessageList
+            messages={sortedMessages}
+            currentUserId={currentUserId}
+            onRetryFailed={onRetryFailed}
+          />
         </ScrollView>
       )}
     </View>

@@ -13,8 +13,8 @@ export interface IBottomMenuProps {
 }
 
 export const BottomMenu: FC<IBottomMenuProps> = (props) => {
-    const { bottom, top } = useSafeAreaInsets()
-    const { hasUnread } = useUnreadCount()
+    const { bottom } = useSafeAreaInsets()
+    const { unreadCount } = useUnreadCount()
 
     return (
         <View
@@ -27,7 +27,7 @@ export const BottomMenu: FC<IBottomMenuProps> = (props) => {
             {
                 menuData.map((item) => {
                     // Показываем бейдж только для Messages
-                    const showBadge = item.path === 'Messages' && hasUnread;
+                    const showBadge = item.path === 'Messages' ? unreadCount : 0;
                     return (
                         <MenuItem
                             key={item.path}
