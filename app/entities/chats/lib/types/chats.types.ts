@@ -1,4 +1,4 @@
-import { ChatDto, ChatMemberDto, CreateChatDto } from "@/api";
+import type { ChatDto, ChatMemberDto, CreateChatDto } from "@/api";
 
 export type { ChatMemberDto };
 

@@ -1,6 +1,12 @@
+import '@/polyfills/installTextEncoding';
 
 // eas build --platform ios
 // eas submit --platform ios
+import { Buffer } from 'buffer';
+if (!(globalThis as { Buffer?: typeof Buffer }).Buffer) {
+    (globalThis as { Buffer: typeof Buffer }).Buffer = Buffer;
+}
+
 import { Navigation } from '@/processes/navigation/ui/Navigation';
 import { StatusBar } from 'expo-status-bar';
 
@@ -37,7 +43,7 @@ export default function App() {
             <AuthProvider>
                 <GlobalCallProvider>
                     <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }} edges={['top']}>
-                        <StatusBar style="dark"  />
+                        <StatusBar style="dark" />
                         <Navigation />
                     </SafeAreaView>
                     <Toast />

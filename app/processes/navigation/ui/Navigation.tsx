@@ -9,29 +9,19 @@ import { useGlobalMessagesSocket } from "@/entities/chats/lib/hooks/useGlobalMes
 import { usePresenceSocket } from "@/entities/presence";
 import { CallWrapperWidget } from "@/widgetes/call/CallWrapper";
 import { BottomMenu } from "@/widgetes/bottom-menu";
+import { useNavigation } from "../lib/hooks/navigation.hook";
+
 
 
 export const Navigation = () => {
-    const { user } = useAuth();
-    const [currentRoute, setCurrentRoute] = useState<keyof TypeRootStackParamList | undefined>(undefined);
-    const navRef = useNavigationContainerRef<NavigationProp<TypeRootStackParamList>>();
 
-    useEffect(() => {
-        setCurrentRoute(navRef.getCurrentRoute()?.name as keyof TypeRootStackParamList);
-
-
-        const listener = navRef.addListener('state', () => {
-            setCurrentRoute(navRef.getCurrentRoute()?.name as keyof TypeRootStackParamList);
-        });
-        return () => navRef.removeListener('state', listener);
-    }, []);
-    useAuthCheck(currentRoute, navRef);
-
-    // Глобальный WebSocket слушатель для уведомлений о сообщениях
+    const { user, currentRoute, navRef } = useNavigation();
+    // // Глобальный WebSocket слушатель для уведомлений о сообщениях
     useGlobalMessagesSocket();
 
-    // Глобальный WebSocket слушатель для presence (онлайн/оффлайн статус)
+    // // Глобальный WebSocket слушатель для presence (онлайн/оффлайн статус)
     usePresenceSocket();
+
     return (
         <CallWrapperWidget>
             <NavigationContainer ref={navRef}>

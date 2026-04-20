@@ -2,19 +2,16 @@ import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { useState } from 'react';
 import { useAuth } from '@/processes/auth/lib/hooks/auth.hook';
 import { Loader } from '@/shared';
-import { ChatListWidget } from '@/widgetes/chat';
-import { useUserChats, ChatType, CreateChat, useCreateChat } from '@/entities/chats';
-import { useUser } from '@/entities/user/lib/hook/user.hook';
-import { ChatMemberDto, CreateChatDto, ChatDto } from '@/api';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { ChatListWidget } from '@/widgetes/chat/ChatListWidget/ChatListWidget';
+import { useUserChats } from '@/entities/chats/lib/hooks/useChats';
+import { IncomingInvitationsBanner } from '@/features/invitations';
 import { Feather } from '@expo/vector-icons';
-import { TypeRootStackParamList } from '@/processes/navigation/interface/navigation.interface';
 
 export default function ChatListScreen() {
     const { user } = useAuth();
-    const navigation = useNavigation<NavigationProp<TypeRootStackParamList>>();
     const [searchQuery, setSearchQuery] = useState('');
-
+    const { data: chats, isLoading: chatsLoading } = useUserChats();
+    console.log('🔐 ChatListScreen - chats:', chats);
     if (!user || !user.id) {
         return (
             <View className="flex-1 items-center justify-center">
@@ -23,9 +20,7 @@ export default function ChatListScreen() {
         );
     }
 
-    const { data: chats, isLoading: chatsLoading } = useUserChats();
-    const { users: allUsers } = useUser(user.id);
-    const createChatMutation = useCreateChat();
+
 
     const chatsArray = Array.isArray(chats) ? chats : [];
 
@@ -42,11 +37,11 @@ export default function ChatListScreen() {
         const aCreatedAt = a.lastMessage?.createdAt;
         const bCreatedAt = b.lastMessage?.createdAt;
 
-        const aDate = aCreatedAt && (typeof aCreatedAt === 'string' || typeof aCreatedAt === 'number' || aCreatedAt instanceof Date)
-            ? new Date(aCreatedAt as string | number | Date).getTime()
+        const aDate = aCreatedAt
+            ? new Date(aCreatedAt as string | number).getTime()
             : 0;
-        const bDate = bCreatedAt && (typeof bCreatedAt === 'string' || typeof bCreatedAt === 'number' || bCreatedAt instanceof Date)
-            ? new Date(bCreatedAt as string | number | Date).getTime()
+        const bDate = bCreatedAt
+            ? new Date(bCreatedAt as string | number).getTime()
             : 0;
 
         return bDate - aDate; // Новые сверху
@@ -63,31 +58,6 @@ export default function ChatListScreen() {
             )
         );
     }) || [];
-
-    const handleUserSelect = async (userId: string) => {
-        // Проверяем, есть ли уже чат с этим пользователем
-        const existingChat = chatsArray.find((c: ChatDto) =>
-            c.members?.some((m: ChatMemberDto) => m.userId === userId)
-        );
-
-        if (existingChat) {
-            navigation.navigate('Chat', { chatId: existingChat.id });
-        } else {
-            // Создаем новый чат
-            try {
-                const chatData: CreateChat = {
-                    type: ChatType.PRIVATE,
-                    memberIds: [user.id, userId],
-                    name: '',
-                    description: '',
-                };
-                const chat = await createChatMutation.mutateAsync(chatData as CreateChatDto);
-                navigation.navigate('Chat', { chatId: chat.id });
-            } catch (error) {
-                console.error('Failed to create chat:', error);
-            }
-        }
-    };
 
     return (
         <View className="flex-1 bg-gray-50">
@@ -112,6 +82,7 @@ export default function ChatListScreen() {
                     />
                 </View>
             </View>
+            <IncomingInvitationsBanner />
             <ChatListWidget
                 chats={filteredChats}
                 currentUserId={user.id}

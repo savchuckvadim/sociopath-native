@@ -39,6 +39,12 @@ export class MessageService {
     }
 
     static async getUnreadCount(chatId: string): Promise<number> {
-        return await $api.messagesGetUnreadCount(chatId) as number;
+        const r = await $api.messagesGetUnreadCount(chatId);
+        return r.count;
+    }
+
+    static async getTotalUnread(): Promise<number> {
+        const r = await $api.messagesGetTotalUnread();
+        return r.total;
     }
 }

@@ -1,4 +1,4 @@
-import { MessageDto } from "@/api";
+import type { MessageDto, UserDto } from "@/api";
 
 export const NO_MESSAGES_MESSAGE = 'Thanks damn! No messages yet';
 
@@ -11,26 +11,14 @@ export enum MessageType {
     SYSTEM = 'SYSTEM',
 }
 
-export interface Message extends MessageDto {
-    id: string;
-    chatId: string;
-    senderId: string;
-    content: string;
+export type ClientOutgoingStatus = 'sending' | 'failed';
+
+export interface Message extends Omit<MessageDto, 'sender' | 'type' | 'replyTo'> {
     type: MessageType;
-    fileUrl?: string;
-    fileName?: string;
-    fileSize?: number;
-    replyToId?: string;
-    editedAt?: string;
-    deletedAt?: string;
-    createdAt: string;
-    updatedAt: string;
-    sender?: {
-        id: string;
-        name: string;
-        email: string;
-    };
+    sender?: UserDto;
     replyTo?: Message;
+    /** Локальный статус исходящего (оптимистичная отправка). */
+    _clientStatus?: ClientOutgoingStatus;
 }
 
 export interface CreateMessage {

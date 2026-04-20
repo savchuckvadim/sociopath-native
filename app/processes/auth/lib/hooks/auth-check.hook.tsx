@@ -1,12 +1,12 @@
 import { useAuth } from "@/processes/auth/lib/hooks/auth.hook";
 import { useEffect } from "react";
 import { AuthService } from "../api/AuthService";
-import { getAccessToken } from "@/api/lib/auth/helper-storage.api";
+import { getAccessToken, getRefreshToken } from "@/api/lib/auth/helper-storage.api";
 import { errorCatch } from "@/api/lib/utils/error.util";
 import { getNewTokens } from "@/api/lib/auth/helper-auth.api";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { EnumAuthType } from "@/api/lib/auth/auth.type";
-import { AUTH_ERRORS, isTokenError } from "@/api/lib/auth/auth-errors.const";
+// import AsyncStorage from "@react-native-async-storage/async-storage";
+// import { EnumAuthType } from "@/api/lib/auth/auth.type";
+import { isTokenError } from "@/api/lib/auth/auth-errors.const";
 import { NavigationProp, CommonActions, NavigationContainerRef } from "@react-navigation/native";
 import { TypeRootStackParamList } from "@/processes/navigation/interface/navigation.interface";
 
@@ -53,7 +53,8 @@ export const useAuthCheck = (
     }
     const checkRefreshToken = async () => {
         console.log('🔍 useAuthCheck: checkRefreshToken called, routeName:', roteName);
-        const refreshToken = await AsyncStorage.getItem(EnumAuthType.REFRESH_TOKEN);
+        // const refreshToken = await AsyncStorage.getItem(EnumAuthType.REFRESH_TOKEN);
+        const refreshToken = await getRefreshToken();
         console.log('🔍 useAuthCheck: Refresh token exists:', !!refreshToken, 'User exists:', !!user);
 
         if (!refreshToken && user) {

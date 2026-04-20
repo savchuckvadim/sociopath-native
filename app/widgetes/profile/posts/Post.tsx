@@ -16,7 +16,7 @@ export default function Post({ post }: IPostProps) {
     return (
 
         <View key={post.id} className="mb-4 p-4 bg-white rounded-2xl border border-gray-200">
-            <View className="flex-row gap-2">
+            <View className="flex-row gap-2 mb-3">
                 <UserAvatar
                     user={user}
                     size="sm"
@@ -48,7 +48,7 @@ export default function Post({ post }: IPostProps) {
                 </View>
             )}
             {post.video && typeof post.video === 'string' && post.video.trim() !== '' && (
-                <View className="mb-2" style={styles.mediaContainer}>
+                <View className="mb-3" style={styles.mediaContainer}>
                     <Video
                         source={{ uri: post.video }}
                         style={styles.video}

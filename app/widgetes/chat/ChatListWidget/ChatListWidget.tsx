@@ -1,5 +1,5 @@
 import { View, ScrollView } from 'react-native';
-import { ChatList } from '@/entities/chats';
+import { ChatList } from '@/entities/chats/ui/ChatsList';
 import { Loader, Empty } from '@/shared';
 import { ChatDto } from '@/api';
 

@@ -59,14 +59,27 @@ export const useAddMember = () => {
     });
 };
 
+export const useDeleteChat = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (chatId: string) => ChatService.deleteChat(chatId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['chats'] });
+        },
+    });
+};
+
 export const useMarkChatAsRead = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: (chatId: string) => ChatService.markAsRead(chatId),
         onSuccess: (_, chatId) => {
+            queryClient.invalidateQueries({ queryKey: ['messages', 'chat', chatId] });
             queryClient.invalidateQueries({ queryKey: ['chats', chatId] });
             queryClient.invalidateQueries({ queryKey: ['chats', 'user'] });
+            queryClient.invalidateQueries({ queryKey: ['messages', 'unread', 'total'] });
         },
     });
 };

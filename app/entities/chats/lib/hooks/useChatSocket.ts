@@ -1,110 +1,103 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, RefObject } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { connectMessagesSocket } from '@/shared/lib/socket/messages-socket';
-import { Message } from '@/entities/messages';
+import type { Message } from '@/entities/messages/lib/types/messages.types';
+import { useMarkChatAsRead } from './useChats';
 import { scrollToBottom } from '@/entities/messages/lib/utils/scroll-to-bottom.util';
-import { RefObject } from 'react';
+import {
+  MessagesWsClientEvent,
+  MessagesWsServerEvent,
+} from '@/entities/messages/lib/const/messages-ws-events';
+import {
+  invalidateChatsAndUnreadIfNotSelf,
+  mergeIncomingMessageIntoChatCache,
+} from '@/entities/messages/lib/utils/incoming-message-cache.util';
 import { ScrollView } from 'react-native';
-import { useAuth } from '@/processes/auth/lib/hooks/auth.hook';
 
 interface UseChatSocketProps {
-    chatId: string | null;
-    userId: string | undefined;
-    messagesEndRef: RefObject<ScrollView | null>;
+  chatId: string | null;
+  userId: string | undefined;
+  messagesEndRef: RefObject<ScrollView | null>;
 }
 
 export const useChatSocket = ({ chatId, userId, messagesEndRef }: UseChatSocketProps) => {
-    const queryClient = useQueryClient();
-    const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const { mutate: markChatAsReadMutate } = useMarkChatAsRead();
+  const disposedRef = useRef(false);
 
-    useEffect(() => {
-        if (!userId || !chatId) return;
+  useEffect(() => {
+    if (!userId || !chatId) return;
 
-        let messagesSocket: any = null;
+    disposedRef.current = false;
 
-        const initSocket = async () => {
-            messagesSocket = await connectMessagesSocket(userId);
+    const initSocket = async (): Promise<() => void> => {
+      const messagesSocket = await connectMessagesSocket(userId);
+      if (disposedRef.current) {
+        return () => undefined;
+      }
 
-            const handleNewMessage = (newMessage: Message) => {
-                console.log('📨 [Chat] New message received via WebSocket:', newMessage);
+      const handleNewMessage = (newMessage: Message) => {
+        if (newMessage.chatId === chatId) {
+          mergeIncomingMessageIntoChatCache(queryClient, chatId, newMessage);
+          if (newMessage.senderId !== userId) {
+            markChatAsReadMutate(chatId);
+          }
+          invalidateChatsAndUnreadIfNotSelf(queryClient, userId, newMessage.senderId);
+          setTimeout(() => {
+            scrollToBottom(messagesEndRef);
+          }, 80);
+        } else {
+          void queryClient.invalidateQueries({ queryKey: ['chats', 'user'] });
+          invalidateChatsAndUnreadIfNotSelf(queryClient, userId, newMessage.senderId);
+        }
+      };
 
-                // Звук уведомлений теперь обрабатывается в useGlobalMessagesSocket
-                // Здесь только обновляем UI текущего открытого чата
+      messagesSocket.on(MessagesWsServerEvent.NEW_MESSAGE, handleNewMessage);
 
-                if (newMessage.chatId === chatId) {
-                    queryClient.setQueryData(
-                        ['messages', 'chat', chatId, 50, 0],
-                        (oldData: Message[] | undefined) => {
-                            if (!oldData) {
-                                return [newMessage];
-                            }
-                            const exists = oldData.some((msg: Message) => msg.id === newMessage.id);
-                            if (exists) {
-                                return oldData;
-                            }
-                            const filtered = oldData.filter((msg: Message) =>
-                                !(msg.id?.startsWith('temp-') && msg.content === newMessage.content && msg.senderId === newMessage.senderId)
-                            );
-                            return [...filtered, newMessage];
-                        }
-                    );
+      const handleChatRead = (payload: { chatId: string }) => {
+        if (payload.chatId === chatId) {
+          void queryClient.invalidateQueries({
+            queryKey: ['messages', 'chat', chatId],
+          });
+        }
+      };
+      messagesSocket.on(MessagesWsServerEvent.CHAT_READ, handleChatRead);
 
-                    queryClient.invalidateQueries({ queryKey: ['chats', 'user'] });
+      const joinChat = () => {
+        messagesSocket.emit(MessagesWsClientEvent.CHAT_JOIN, { chatId }, (response: { error?: string } | null) => {
+          if (response?.error) {
+            console.error('Chat join error:', response.error);
+          }
+        });
+      };
 
-                    setTimeout(() => {
-                        scrollToBottom(messagesEndRef);
-                    }, 100);
-                } else {
-                    queryClient.invalidateQueries({ queryKey: ['chats', 'user'] });
-                }
-            };
-
-            messagesSocket.on('message:new', handleNewMessage);
-
-            messagesSocket.on('chat:joined', (data: { chatId?: string;[key: string]: unknown }) => {
-                console.log('✅ Joined chat room:', data);
-            });
-
-            const joinChat = () => {
-                console.log('📤 Joining chat:', chatId);
-                messagesSocket.emit('chat:join', { chatId }, (response: { error?: string;[key: string]: unknown } | null) => {
-                    if (response?.error) {
-                        console.error('❌ Chat join error:', response.error);
-                    } else {
-                        console.log('✅ Chat join success:', response);
-                    }
-                });
-            };
-
-            if (messagesSocket.connected) {
-                joinChat();
-            } else {
-                const connectHandler = () => {
-                    joinChat();
-                    messagesSocket.off('connect', connectHandler);
-                };
-                messagesSocket.on('connect', connectHandler);
-            }
-
-            messagesSocket.on('reconnect', () => {
-                console.log('🔄 Messages socket reconnected');
-                joinChat();
-            });
-
-            return () => {
-                messagesSocket.off('message:new', handleNewMessage);
-                if (chatId) {
-                    messagesSocket.emit('chat:leave', { chatId });
-                }
-            };
+      if (messagesSocket.connected) {
+        joinChat();
+      } else {
+        const connectHandler = () => {
+          joinChat();
+          messagesSocket.off('connect', connectHandler);
         };
+        messagesSocket.on('connect', connectHandler);
+      }
 
-        const cleanup = initSocket();
+      messagesSocket.on('reconnect', joinChat);
 
-        return () => {
-            cleanup.then((cleanupFn) => {
-                if (cleanupFn) cleanupFn();
-            });
-        };
-    }, [chatId, userId, queryClient, messagesEndRef, user?.id]);
+      return () => {
+        messagesSocket.off(MessagesWsServerEvent.NEW_MESSAGE, handleNewMessage);
+        messagesSocket.off(MessagesWsServerEvent.CHAT_READ, handleChatRead);
+        messagesSocket.off('reconnect', joinChat);
+        if (chatId) {
+          messagesSocket.emit(MessagesWsClientEvent.CHAT_LEAVE, { chatId });
+        }
+      };
+    };
+
+    const p = initSocket();
+
+    return () => {
+      disposedRef.current = true;
+      void p.then((cleanup) => cleanup());
+    };
+  }, [chatId, userId, queryClient, messagesEndRef, markChatAsReadMutate]);
 };

@@ -4,4 +4,6 @@ export * from './lib/hooks/useChats';
 export * from './lib/hooks/useSendMessage';
 export * from './lib/hooks/useChatSocket';
 export * from './lib/hooks/useGlobalMessagesSocket';
+export * from './lib/hooks/useEnsurePrivateChat';
+export * from './lib/utils/find-private-chat-with-peer';
 export * from './ui/ChatsList';

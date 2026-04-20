@@ -1,9 +1,11 @@
-import Home from "@/screens/home/Home";
-import Auth from "@/screens/auth/Auth";
 import { IRoute } from "../interface/navigation.interface";
-import { Chats, People, Me, Settings, ChatScreen, UserProfile } from "@/screens";
+import Me from "@/screens/me/Me";
+import People from "@/screens/people/People";
+import Settings from "@/screens/settings/Settings";
+import UserProfile from "@/screens/user-profile/UserProfile";
 import Call from "@/entities/call/ui/Call";
-// import Chats from "@/components/screens/chats/Chats";
+import Chats from "@/screens/chats/Chats";
+import { ChatScreen } from "@/screens";
 
 export const routes: IRoute[] = [
     // {

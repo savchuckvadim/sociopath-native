@@ -1,9 +1,8 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { TypeRootStackParamList } from "../../interface/navigation.interface";
+import { IRoute, TypeRootStackParamList } from "../../interface/navigation.interface";
 import { routes } from "../routes";
-import { IRoute } from "../../interface/navigation.interface";
 import { useAuth } from "@/processes/auth/lib/hooks/auth.hook";
-import { Auth } from "@/screens";
+import Auth from "@/screens/auth/Auth";
 
 
 const Stack = createNativeStackNavigator<TypeRootStackParamList>();
@@ -23,8 +22,8 @@ export const PrivateNavigator = () => {
                 key={route.name}
                 {...route}
             />
-
             )) : <Stack.Screen name="Auth" component={Auth} />}
+
         </Stack.Navigator>
     )
 }

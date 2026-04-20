@@ -12,7 +12,12 @@ export const ChatList: React.FC<ChatListProps> = ({ chats, currentUserId }) => {
     return (
         <View className="flex flex-col gap-2 p-2">
             {chats.map((chat: ChatDto) => (
-                <ChatsListItem key={chat.id} chat={chat} currentUserId={currentUserId} />
+                <ChatsListItem
+                    key={chat.id}
+                    chat={chat}
+                    currentUserId={currentUserId}
+                    allChats={chats}
+                />
             ))}
         </View>
     );

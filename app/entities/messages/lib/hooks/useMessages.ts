@@ -19,6 +19,17 @@ export const useChatMessages = (chatId: string, limit?: number, offset?: number)
     });
 };
 
+export const useTotalUnreadMessages = () => {
+    const { user } = useAuth();
+
+    return useQuery({
+        queryKey: ['messages', 'unread', 'total'],
+        queryFn: () => MessageService.getTotalUnread(),
+        enabled: !!user?.id,
+        refetchInterval: 30_000,
+    });
+};
+
 export const useMessageById = (messageId: string) => {
     const { user } = useAuth();
 
@@ -34,9 +45,9 @@ export const useCreateMessage = () => {
 
     return useMutation({
         mutationFn: (data: CreateMessageDto) => MessageService.createMessage(data),
-        onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: ['messages', 'chat', variables.chatId] });
+        onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['chats', 'user'] });
+            queryClient.invalidateQueries({ queryKey: ['messages', 'unread', 'total'] });
         },
     });
 };

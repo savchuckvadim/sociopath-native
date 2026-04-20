@@ -4,6 +4,7 @@ import { useAuth } from "./auth.hook";
 import { useMutation } from "@tanstack/react-query";
 import { AuthService } from "../api/AuthService";
 import { useMemo } from "react";
+import { initMessengerCryptoSession } from "@/entities/encryption/lib/init-messenger-crypto";
 
 export const useAuthMutations = (
     reset: UseFormReset<IAuthFormData>
@@ -15,6 +16,7 @@ export const useAuthMutations = (
         mutationFn: ({ email, password }: IAuthFormData) => authService.login(email, password),
         onSuccess: (data) => {
             setUser(data);
+            void initMessengerCryptoSession();
             reset();
         },
         onError: (error) => {
@@ -27,6 +29,7 @@ export const useAuthMutations = (
         mutationFn: ({ email, password, name }: IAuthFormData) => authService.registration({ email, password, name }),
         onSuccess: (data) => {
             setUser(data);
+            void initMessengerCryptoSession();
             reset();
         },
         onError: (error) => {

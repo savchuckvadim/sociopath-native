@@ -1,82 +1,72 @@
 import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { connectMessagesSocket } from '@/shared/lib/socket/messages-socket';
-import { Message } from '@/entities/messages';
+import type { Message } from '@/entities/messages/lib/types/messages.types';
 import { playMessageSound } from '@/shared/lib/notifications/sound-notification';
 import { useAuth } from '@/processes/auth/lib/hooks/auth.hook';
+import { MessagesWsServerEvent } from '@/entities/messages/lib/const/messages-ws-events';
+import { invalidateChatsAndUnreadIfNotSelf } from '@/entities/messages/lib/utils/incoming-message-cache.util';
 
-/**
- * Глобальный хук для прослушивания всех сообщений через WebSocket
- * Работает всегда, когда пользователь авторизован
- * Отвечает за:
- * - Воспроизведение звука уведомлений
- * - Обновление списка чатов
- */
 export function useGlobalMessagesSocket() {
-    const queryClient = useQueryClient();
-    const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
 
-    useEffect(() => {
-        if (!user?.id) return;
+  useEffect(() => {
+    if (!user?.id) return;
 
-        let messagesSocket: any = null;
-        let isMounted = true;
+    let isMounted = true;
 
-        const initSocket = async () => {
-            try {
-                messagesSocket = await connectMessagesSocket(user.id);
+    const initSocket = async (): Promise<(() => void) | void> => {
+      try {
+        const messagesSocket = await connectMessagesSocket(user.id);
+        if (!isMounted || !messagesSocket) return;
 
-                const handleNewMessage = (newMessage: Message) => {
-                    if (!isMounted) return;
+        const handleNewMessage = (newMessage: Message) => {
+          if (!isMounted) return;
 
-                    console.log('📨 [Global] New message received via WebSocket:', newMessage);
+          const isFromCurrentUser = newMessage.senderId === user.id;
 
-                    // Проверяем, не от текущего пользователя ли сообщение
-                    const isFromCurrentUser = newMessage.senderId === user.id;
+          if (!isFromCurrentUser) {
+            playMessageSound().catch((error) => {
+              console.error('Failed to play notification sound:', error);
+            });
+          }
 
-                    if (!isFromCurrentUser) {
-                        // Воспроизводим звук для всех сообщений от других пользователей
-                        playMessageSound().catch((error) => {
-                            console.error('Failed to play notification sound:', error);
-                        });
-                    }
-
-                    // Всегда обновляем список чатов при получении нового сообщения
-                    queryClient.invalidateQueries({ queryKey: ['chats', 'user'] });
-
-                    // Также обновляем кэш сообщений для конкретного чата (если он загружен)
-                    queryClient.invalidateQueries({
-                        queryKey: ['messages', 'chat', newMessage.chatId]
-                    });
-                };
-
-                // Подписываемся на событие новых сообщений
-                messagesSocket.on('message:new', handleNewMessage);
-
-                // Обработка переподключения
-                messagesSocket.on('reconnect', () => {
-                    console.log('🔄 [Global] Messages socket reconnected');
-                });
-
-                // Очистка при размонтировании
-                return () => {
-                    isMounted = false;
-                    if (messagesSocket) {
-                        messagesSocket.off('message:new', handleNewMessage);
-                    }
-                };
-            } catch (error) {
-                console.error('❌ [Global] Failed to initialize messages socket:', error);
-            }
+          void queryClient.invalidateQueries({ queryKey: ['chats', 'user'] });
+          void queryClient.invalidateQueries({
+            queryKey: ['messages', 'chat', newMessage.chatId],
+          });
+          invalidateChatsAndUnreadIfNotSelf(queryClient, user.id, newMessage.senderId);
         };
 
-        const cleanup = initSocket();
+        const handleChatRead = (payload: { chatId: string }) => {
+          void queryClient.invalidateQueries({
+            queryKey: ['messages', 'chat', payload.chatId],
+          });
+          void queryClient.invalidateQueries({ queryKey: ['chats', 'user'] });
+        };
+
+        messagesSocket.on(MessagesWsServerEvent.NEW_MESSAGE, handleNewMessage);
+        messagesSocket.on(MessagesWsServerEvent.CHAT_READ, handleChatRead);
+
+        messagesSocket.on('reconnect', () => {
+          console.log('🔄 [Global] Messages socket reconnected');
+        });
 
         return () => {
-            isMounted = false;
-            cleanup.then((cleanupFn) => {
-                if (cleanupFn) cleanupFn();
-            });
+          messagesSocket.off(MessagesWsServerEvent.NEW_MESSAGE, handleNewMessage);
+          messagesSocket.off(MessagesWsServerEvent.CHAT_READ, handleChatRead);
         };
-    }, [user?.id, queryClient]);
+      } catch (error) {
+        console.error('❌ [Global] Failed to initialize messages socket:', error);
+      }
+    };
+
+    const p = initSocket();
+
+    return () => {
+      isMounted = false;
+      void p.then((cleanup) => cleanup?.());
+    };
+  }, [user?.id, queryClient]);
 }

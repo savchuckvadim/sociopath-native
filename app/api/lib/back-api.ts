@@ -3,7 +3,6 @@ import { Platform } from 'react-native';
 import { SERVER_URL } from '@/config/api.config';
 
 console.log('back-api SERVER_URL', SERVER_URL);
-debugger
 // Для Android эмулятора localhost не работает, нужно использовать 10.0.2.2
 // Для iOS эмулятора localhost работает
 // Для веба используем localhost или SERVER_URL из env

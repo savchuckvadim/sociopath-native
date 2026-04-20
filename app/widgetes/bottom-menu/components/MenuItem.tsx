@@ -1,7 +1,7 @@
 import { Pressable, View } from "react-native"
 
 import { FC } from "react"
-import { TypeRootStackParamList } from "@/processes"
+import type { TypeRootStackParamList } from "@/processes/navigation/interface/navigation.interface";
 import clsx from "clsx"
 import { colors } from "@/shared/style/colors"
 import { IMenuItem, TypeNavigate } from "../interface/menu-item.interface"

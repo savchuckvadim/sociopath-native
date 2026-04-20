@@ -1,4 +1,4 @@
-import { useUserChats } from '@/entities/chats';
+import { useUserChats } from '@/entities/chats/lib/hooks/useChats';
 import { useAuth } from '@/processes/auth/lib/hooks/auth.hook';
 
 /**

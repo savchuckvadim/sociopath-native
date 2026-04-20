@@ -1,7 +1,7 @@
 // packages/nest-api/orval.config.ts
 export default {
     api: {
-        input: 'http://localhost:3000/docs/api-json', // || 'https://api.sociopath-network.ru/docs/api-json',
+        input:  'https://api.sociopath-network.ru/docs/api-json', // 'http://localhost:3000/docs/api-json', // ||
         output: {
             target: 'app/api/generated/api.ts',
             client: 'axios', // или 'react-query'

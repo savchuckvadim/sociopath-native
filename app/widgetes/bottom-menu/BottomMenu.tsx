@@ -1,4 +1,4 @@
-import { TypeRootStackParamList } from "@/processes"
+import type { TypeRootStackParamList } from "@/processes/navigation/interface/navigation.interface";
 import { FC } from "react"
 import { TypeNavigate } from "./interface/menu-item.interface"
 import { menuData } from "./interface/menu-data"

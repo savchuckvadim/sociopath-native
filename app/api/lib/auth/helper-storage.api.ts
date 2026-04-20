@@ -19,6 +19,7 @@ export const saveTokensToStorage = async (tokens: ITokens) => {
         await setItemAsync(EnumAuthType.ACCESS_TOKEN, tokens.accessToken);
         await setItemAsync(EnumAuthType.REFRESH_TOKEN, tokens.refreshToken);
     } catch (error) {
+        console.error('🗑️ saveTokensToStorage error:', error);
         return null;
     }
 }
@@ -43,6 +44,7 @@ export const getUserFromStorage = async () => {
         const user = await AsyncStorage.getItem(EnumAsynStorage.USER);
         return user ? JSON.parse(user) : null;
     } catch (error) {
+        console.error('🗑️ getUserFromStorage error:', error);
         return null;
     }
 }
@@ -70,6 +72,7 @@ export const saveToStorage = async (data: IAuthResponse) => {
 
         await setUserToStorage(data.user);
     } catch (error) {
+        console.error('🗑️ saveToStorage error:', error);
         return null;
     }
 }
