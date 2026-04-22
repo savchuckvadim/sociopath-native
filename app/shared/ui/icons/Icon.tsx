@@ -1,5 +1,5 @@
 import React from 'react';
-import Svg, { Path, Rect, G, Mask, Defs, ClipPath } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
 import { IconName, iconDefinitions, PathDefinition } from './icons-sprite';
 import { EIconColor } from './type/icon-type';
 

@@ -1,6 +1,6 @@
 import { View, Text,  Image, StyleSheet } from "react-native";
 import { UserAvatar } from "@/shared";
-import { Video, ResizeMode } from "expo-av";
+import { VideoView, useVideoPlayer } from "expo-video";
 import { PostDto } from "@/api";
 import { useUser } from "@/entities/user";
 
@@ -11,6 +11,9 @@ interface IPostProps {
 
 export default function Post({ post }: IPostProps) {
     const { user } = useUser(post.author?.id || '');
+    const videoPlayer = useVideoPlayer(post.video || '', player => {
+        player.loop = false;
+    });
 
 
     return (
@@ -49,12 +52,12 @@ export default function Post({ post }: IPostProps) {
             )}
             {post.video && typeof post.video === 'string' && post.video.trim() !== '' && (
                 <View className="mb-3" style={styles.mediaContainer}>
-                    <Video
-                        source={{ uri: post.video }}
+                    <VideoView
+                        player={videoPlayer}
                         style={styles.video}
-                        useNativeControls
-                        resizeMode={ResizeMode.CONTAIN}
-                        isLooping={false}
+                        contentFit="contain"
+                        allowsFullscreen
+                        nativeControls
                     />
                 </View>
             )}

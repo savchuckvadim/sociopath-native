@@ -8,7 +8,7 @@ console.log('back-api SERVER_URL', SERVER_URL);
 // Для веба используем localhost или SERVER_URL из env
 const getBaseUrl = () => {
     // baseURL должен быть БЕЗ /api, так как все запросы уже содержат /api в пути
-    const baseUrl = SERVER_URL || "http://10.0.2.2:3000"// 'http://10.0.2.2:3000'  //|| SERVER_URL ||;
+    const baseUrl = SERVER_URL || 'https://api.sociopath-network.ru' || "http://10.0.2.2:3000"// 'http://10.0.2.2:3000'  //|| SERVER_URL ||;
     return baseUrl;
     // let baseUrl = SERVER_URL || 'http://127.0.0.1:3000';
 

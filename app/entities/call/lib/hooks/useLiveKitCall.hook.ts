@@ -3,6 +3,7 @@ import { useAuth } from '@/processes/auth/lib/hooks/auth.hook';
 import { connectWebSocket } from '@/shared/lib/socket/websocket';
 import { CallEvent } from '../types/call-event.type';
 import { IncomingCallData } from '../types/call.types';
+import { DeviceEventEmitter } from 'react-native';
 
 interface UseLiveKitCallOptions {
     chatId: string | null;
@@ -21,6 +22,7 @@ export const useLiveKitCall = ({ chatId }: UseLiveKitCallOptions) => {
     const [remoteUserId, setRemoteUserId] = useState<string | null>(null);
     const [activeOtherUserId, setActiveOtherUserId] = useState<string | null>(null);
     const [socket, setSocket] = useState<any>(null);
+    const [callStartedAt, setCallStartedAt] = useState<number | null>(null);
 
     // Инициализация сокета
     useEffect(() => {
@@ -75,6 +77,22 @@ export const useLiveKitCall = ({ chatId }: UseLiveKitCallOptions) => {
         };
     }, [socket, user?.id]);
 
+    useEffect(() => {
+        const subscription = DeviceEventEmitter.addListener(
+            'call:incoming:push',
+            (data: IncomingCallData) => {
+                setIncomingCallData(data);
+                setIsIncomingCall(true);
+                setActiveOtherUserId(data.fromUserId);
+                setCallType(data.type);
+            },
+        );
+
+        return () => {
+            subscription.remove();
+        };
+    }, []);
+
     // Обработка завершения звонка
     useEffect(() => {
         if (!socket) {
@@ -91,6 +109,7 @@ export const useLiveKitCall = ({ chatId }: UseLiveKitCallOptions) => {
                 setIncomingCallData(null);
                 setRemoteUserId(null);
                 setActiveOtherUserId(null);
+                setCallStartedAt(null);
             }
         };
 
@@ -117,6 +136,7 @@ export const useLiveKitCall = ({ chatId }: UseLiveKitCallOptions) => {
         setRemoteUserId(otherUserId);
         setCallType(type);
         setIsInCall(true);
+        setCallStartedAt(Date.now());
         setIsIncomingCall(false);
 
         // Отправляем событие инициации звонка через socket (для уведомления другого пользователя)
@@ -148,6 +168,7 @@ export const useLiveKitCall = ({ chatId }: UseLiveKitCallOptions) => {
         setCallType(incomingCallData.type);
         setIsIncomingCall(false);
         setIsInCall(true);
+        setCallStartedAt(Date.now());
 
         // Отправляем событие принятия звонка
         if (socket) {
@@ -172,13 +193,15 @@ export const useLiveKitCall = ({ chatId }: UseLiveKitCallOptions) => {
         // Отправляем событие отклонения (через call:end)
         if (socket) {
             socket.emit(CallEvent.END, {
-                toUserId: incomingCallData.fromUserId
+                toUserId: incomingCallData.fromUserId,
+                endedReason: 'REJECTED',
             });
         }
 
         setIsIncomingCall(false);
         setIncomingCallData(null);
         setActiveOtherUserId(null);
+        setCallStartedAt(null);
     }, [incomingCallData, socket]);
 
     // Завершение звонка
@@ -188,8 +211,13 @@ export const useLiveKitCall = ({ chatId }: UseLiveKitCallOptions) => {
         // Отправляем событие завершения звонка
         if (socket && (activeOtherUserId || remoteUserId)) {
             const targetUserId = remoteUserId || activeOtherUserId;
+            const duration = callStartedAt
+                ? Math.max(0, Math.floor((Date.now() - callStartedAt) / 1000))
+                : undefined;
             socket.emit(CallEvent.END, {
-                toUserId: targetUserId
+                toUserId: targetUserId,
+                endedReason: 'CANCELED',
+                duration,
             });
         }
 
@@ -198,7 +226,8 @@ export const useLiveKitCall = ({ chatId }: UseLiveKitCallOptions) => {
         setIncomingCallData(null);
         setRemoteUserId(null);
         setActiveOtherUserId(null);
-    }, [socket, activeOtherUserId, remoteUserId]);
+        setCallStartedAt(null);
+    }, [socket, activeOtherUserId, remoteUserId, callStartedAt]);
 
     return {
         isInCall,

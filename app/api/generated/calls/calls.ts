@@ -5,7 +5,7 @@
  * API for auth backend for monorepo
  * OpenAPI spec version: 1.0
  */
-import type { CallTokenDto, GetTokenDto } from '.././model';
+import type { CallHistoryItemDto, CallTokenDto, GetTokenDto } from '.././model';
 
 import { customAxios } from '../../lib/back-api';
 
@@ -21,8 +21,20 @@ export const getCalls = () => {
       data: getTokenDto,
     });
   };
-  return { callsGetToken };
+  /**
+   * @summary Get call history for chat (non-secret chats only)
+   */
+  const callsGetChatCallHistory = (chatId: string) => {
+    return customAxios<CallHistoryItemDto[]>({
+      url: `/api/calls/chat/${chatId}/history`,
+      method: 'GET',
+    });
+  };
+  return { callsGetToken, callsGetChatCallHistory };
 };
 export type CallsGetTokenResult = NonNullable<
   Awaited<ReturnType<ReturnType<typeof getCalls>['callsGetToken']>>
+>;
+export type CallsGetChatCallHistoryResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof getCalls>['callsGetChatCallHistory']>>
 >;
